@@ -11,7 +11,7 @@ It comprises of:
 ![graph_abs-GA](https://github.com/bbdataeng/BB4FAIR/assets/51079644/a4f62d7a-222d-48b1-83b8-356edc262542)
 
 
-## Requirements
+### Requirements
 
 #### R packages   
 dplyr ggplot2 rmarkdown readr tidyverse readxl formattable tidyr RColorBrewer viridis fmsb stringr officer unikn    
