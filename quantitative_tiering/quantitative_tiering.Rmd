@@ -27,14 +27,14 @@ quant <- read_excel("./data/quantitativa.xlsx", sheet = "razionale")
 quant <- quant[1:14,1:6]
 quant <- quant[order(quant$id), ]
 survey <- read_excel("./data/231206-risposte.xlsx")
+bb <- survey$ID
 survey <- as.data.frame(survey[,c(7:44)]) 
-
+bb <- paste0("BB", bb)
 ```
 
 
 ```{r matrice_punteggi}
 
-bb <- survey$`Nome della Biobanca`
 
 punteggi <- matrix(0, nrow = length(bb), ncol = length(quant$id), dimnames = list(bb, quant$domanda))
 
@@ -352,18 +352,18 @@ punteggi$`Nome biobanca` <- row
 punteggi <- punteggi %>%
   relocate(`Nome biobanca`)
 
-wb <- createWorkbook()
-addWorksheet(wb, sheetName = "punteggi_totali")
-addWorksheet(wb, sheetName = "tier_1")
-addWorksheet(wb, sheetName = "tier_2")
-addWorksheet(wb, sheetName = "tier_3")
-
-writeData(wb, sheet = "punteggi_totali", punteggi)
-writeData(wb, sheet = "tier_1", tier_1, colNames = F)
-writeData(wb, sheet = "tier_2", tier_2, colNames = F)
-writeData(wb, sheet = "tier_3", tier_3, colNames = F)
-
-saveWorkbook(wb, "punteggi_tiering.xlsx")
+# wb <- createWorkbook()
+# addWorksheet(wb, sheetName = "punteggi_totali")
+# addWorksheet(wb, sheetName = "tier_1")
+# addWorksheet(wb, sheetName = "tier_2")
+# addWorksheet(wb, sheetName = "tier_3")
+# 
+# writeData(wb, sheet = "punteggi_totali", punteggi)
+# writeData(wb, sheet = "tier_1", tier_1, colNames = F)
+# writeData(wb, sheet = "tier_2", tier_2, colNames = F)
+# writeData(wb, sheet = "tier_3", tier_3, colNames = F)
+# 
+# saveWorkbook(wb, "punteggi_tiering.xlsx")
 
 ```
 

@@ -9,11 +9,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Federica" />
+<meta name="author" content="Federica Rossi" />
 
 <meta name="date" content="2023-11-13" />
 
-<title>Tiering survey</title>
+<title>Tiering Survey</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -438,16 +438,14 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Tiering survey</h1>
-<h4 class="author">Federica</h4>
+<h1 class="title toc-ignore">Tiering Survey</h1>
+<h4 class="author">Federica Rossi</h4>
 <h4 class="date">2023-11-13</h4>
 
 </div>
 
 
-<pre class="r"><code>bb &lt;- survey$`Nome della Biobanca`
-
-punteggi &lt;- matrix(0, nrow = length(bb), ncol = length(quant$id), dimnames = list(bb, quant$domanda))
+<pre class="r"><code>punteggi &lt;- matrix(0, nrow = length(bb), ncol = length(quant$id), dimnames = list(bb, quant$domanda))
 
 survey[is.na(survey)] &lt;- &quot;non compilato&quot;
 
@@ -743,22 +741,22 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <table style="width:100%;">
 <caption>sommatoria punteggi</caption>
 <colgroup>
-<col width="29%" />
-<col width="4%" />
-<col width="6%" />
-<col width="3%" />
-<col width="1%" />
-<col width="1%" />
-<col width="6%" />
 <col width="2%" />
 <col width="6%" />
-<col width="2%" />
-<col width="5%" />
-<col width="1%" />
-<col width="4%" />
 <col width="9%" />
+<col width="5%" />
+<col width="2%" />
+<col width="2%" />
+<col width="8%" />
+<col width="3%" />
+<col width="9%" />
+<col width="4%" />
+<col width="7%" />
+<col width="2%" />
 <col width="6%" />
-<col width="6%" />
+<col width="13%" />
+<col width="9%" />
+<col width="8%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -782,7 +780,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">ARC.Net</td>
+<td align="left">BB27</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">3</td>
@@ -800,7 +798,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">15</td>
 </tr>
 <tr class="even">
-<td align="left">Banca.Biologica.INMI.L.Spallanzani..bbmri.eric.ID.IT_1384262955037988.</td>
+<td align="left">BB29</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">0</td>
@@ -818,7 +816,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">14</td>
 </tr>
 <tr class="odd">
-<td align="left">Banca.Biologica.Oncologica.Pediatrica</td>
+<td align="left">BB35</td>
 <td align="right">0</td>
 <td align="right">0</td>
 <td align="right">0</td>
@@ -836,7 +834,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">13</td>
 </tr>
 <tr class="even">
-<td align="left">BCU.Imaging.Biobank</td>
+<td align="left">BB39</td>
 <td align="right">0</td>
 <td align="right">0</td>
 <td align="right">3</td>
@@ -854,7 +852,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">11</td>
 </tr>
 <tr class="odd">
-<td align="left">Biobanca.Bruno.Boerci.di.ICS.Maugeri</td>
+<td align="left">BB19</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">3</td>
@@ -872,7 +870,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">19</td>
 </tr>
 <tr class="even">
-<td align="left">Biobanca.Cardiovascolare.BioCor</td>
+<td align="left">BB10</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">3</td>
@@ -890,7 +888,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">23</td>
 </tr>
 <tr class="odd">
-<td align="left">Biobanca.del.CRESM..CRESM.Biobank</td>
+<td align="left">BB34</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">0</td>
@@ -908,7 +906,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">13</td>
 </tr>
 <tr class="even">
-<td align="left">Biobanca.del.Laboratorio.di.Genetica.Umana</td>
+<td align="left">BB33</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">0</td>
@@ -926,7 +924,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">13</td>
 </tr>
 <tr class="odd">
-<td align="left">Biobanca.di.ricerca.AUSL…IRCCS.di.Reggio.Emilia</td>
+<td align="left">BB12</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">1</td>
@@ -944,7 +942,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">22</td>
 </tr>
 <tr class="even">
-<td align="left">Biobanca.di.Ricerca.OPBG</td>
+<td align="left">BB6</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">3</td>
@@ -962,7 +960,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">25</td>
 </tr>
 <tr class="odd">
-<td align="left">Biobanca.di.ricerca.per.la.medicina.personalizzata</td>
+<td align="left">BB17</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">0</td>
@@ -980,7 +978,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">20</td>
 </tr>
 <tr class="even">
-<td align="left">Biobanca.di.ricerca.per.la.medicina.personalizzata.1</td>
+<td align="left">BB3</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">2</td>
@@ -998,7 +996,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">26</td>
 </tr>
 <tr class="odd">
-<td align="left">BIOBANCA.DI.RICERCA.UNIVERSITARIA.UdACAST</td>
+<td align="left">BB36</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">0</td>
@@ -1016,7 +1014,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">13</td>
 </tr>
 <tr class="even">
-<td align="left">Biobanca.Interistituzionale.Multidisciplinare…BioBIM</td>
+<td align="left">BB2</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">3</td>
@@ -1034,7 +1032,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">28</td>
 </tr>
 <tr class="odd">
-<td align="left">Biobanca.IRCCS.Istituto.Centro.San.Giovanni.di.Dio.Fatebenefratelli..Biobank.FBF.</td>
+<td align="left">BB30</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">0</td>
@@ -1052,7 +1050,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">14</td>
 </tr>
 <tr class="even">
-<td align="left">BioBanca.Istituzionale.Bari</td>
+<td align="left">BB20</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">3</td>
@@ -1070,7 +1068,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">18</td>
 </tr>
 <tr class="odd">
-<td align="left">Biobanca.Istituzionale.BBI</td>
+<td align="left">BB13</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">1</td>
@@ -1088,7 +1086,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">21</td>
 </tr>
 <tr class="even">
-<td align="left">Biobanca.SDN</td>
+<td align="left">BB21</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">0</td>
@@ -1106,7 +1104,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">17</td>
 </tr>
 <tr class="odd">
-<td align="left">Biobank.for.Translational.and.Digital.Medicine</td>
+<td align="left">BB1</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">2</td>
@@ -1124,7 +1122,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">28</td>
 </tr>
 <tr class="even">
-<td align="left">Biobank.of.Veterinary.Resources</td>
+<td align="left">BB28</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">0</td>
@@ -1142,7 +1140,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">15</td>
 </tr>
 <tr class="odd">
-<td align="left">BIOGER…Biobanca.Istituzionale.dell.IRCCS.INRCA..Ancona</td>
+<td align="left">BB23</td>
 <td align="right">0</td>
 <td align="right">0</td>
 <td align="right">1</td>
@@ -1160,7 +1158,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">17</td>
 </tr>
 <tr class="even">
-<td align="left">CCPP.Biobank</td>
+<td align="left">BB9</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">3</td>
@@ -1178,7 +1176,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">23</td>
 </tr>
 <tr class="odd">
-<td align="left">Cell.lines.and.DNA.bank.of.Genetic.Movement.Disorders.and.Mitochondrial.Diseases</td>
+<td align="left">BB32</td>
 <td align="right">0</td>
 <td align="right">0</td>
 <td align="right">0</td>
@@ -1196,7 +1194,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">13</td>
 </tr>
 <tr class="even">
-<td align="left">CENTRO.DI.RISORSE.BIOLOGICHE.IRCCS.Policlinico.San.Martino..Genova</td>
+<td align="left">BB4</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">3</td>
@@ -1214,7 +1212,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">26</td>
 </tr>
 <tr class="odd">
-<td align="left">Centro.Raccolta.Materiale.Biologico.Alessandria.Biobank</td>
+<td align="left">BB25</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">3</td>
@@ -1232,7 +1230,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">15</td>
 </tr>
 <tr class="even">
-<td align="left">Centro.Risiorse.Biologiche.Istituto.Ortopedico.Rizzoli…CRB.IOR</td>
+<td align="left">BB11</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">3</td>
@@ -1250,7 +1248,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">22</td>
 </tr>
 <tr class="odd">
-<td align="left">Centro.Risorse.Biologiche..CRB.</td>
+<td align="left">BB5</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">3</td>
@@ -1268,7 +1266,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">26</td>
 </tr>
 <tr class="even">
-<td align="left">Centro.Risorse.Biologiche.IGB.CNR..CRB.IGB.CNR.</td>
+<td align="left">BB37</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">0</td>
@@ -1286,7 +1284,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">13</td>
 </tr>
 <tr class="odd">
-<td align="left">Centro.Risorse.Biologiche.Biobanca.POLI.MI</td>
+<td align="left">BB15</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">0</td>
@@ -1304,7 +1302,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">21</td>
 </tr>
 <tr class="even">
-<td align="left">CHRIS.Biobank</td>
+<td align="left">BB26</td>
 <td align="right">0</td>
 <td align="right">1</td>
 <td align="right">3</td>
@@ -1322,7 +1320,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">15</td>
 </tr>
 <tr class="odd">
-<td align="left">CRB.Centro.Risorse.Biologiche.Neurome.Biobanking.Center</td>
+<td align="left">BB38</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">2</td>
@@ -1340,7 +1338,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">12</td>
 </tr>
 <tr class="even">
-<td align="left">CRB.IRST</td>
+<td align="left">BB7</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">3</td>
@@ -1358,7 +1356,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">25</td>
 </tr>
 <tr class="odd">
-<td align="left">da.Vinci.European.BioBank…daVEB</td>
+<td align="left">BB41</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">0</td>
@@ -1376,7 +1374,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">8</td>
 </tr>
 <tr class="even">
-<td align="left">Genetic.Biobank.of.Siena</td>
+<td align="left">BB40</td>
 <td align="right">0</td>
 <td align="right">0</td>
 <td align="right">0</td>
@@ -1394,7 +1392,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">9</td>
 </tr>
 <tr class="odd">
-<td align="left">Humanitas.Hospital.Biological.Resource.Center</td>
+<td align="left">BB22</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">1</td>
@@ -1412,7 +1410,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">17</td>
 </tr>
 <tr class="even">
-<td align="left">IRCCS.ISTITUTO.NAZIONALE.TUMORI.REGINA.ELENA..BBIRE</td>
+<td align="left">BB8</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">0</td>
@@ -1430,7 +1428,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">24</td>
 </tr>
 <tr class="odd">
-<td align="left">IRCCS.CROB.BASILICATA.BIOBANK</td>
+<td align="left">BB45</td>
 <td align="right">0</td>
 <td align="right">0</td>
 <td align="right">0</td>
@@ -1448,7 +1446,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">3</td>
 </tr>
 <tr class="even">
-<td align="left">LRPO.ISPRO</td>
+<td align="left">BB44</td>
 <td align="right">0</td>
 <td align="right">0</td>
 <td align="right">0</td>
@@ -1466,7 +1464,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">5</td>
 </tr>
 <tr class="odd">
-<td align="left">Neuromuscular.Bank.of.Tissues.and.DNA.samples</td>
+<td align="left">BB42</td>
 <td align="right">0</td>
 <td align="right">0</td>
 <td align="right">0</td>
@@ -1484,7 +1482,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">8</td>
 </tr>
 <tr class="even">
-<td align="left">Neuromuscular.Disease.Biobank</td>
+<td align="left">BB43</td>
 <td align="right">0</td>
 <td align="right">0</td>
 <td align="right">0</td>
@@ -1502,7 +1500,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">8</td>
 </tr>
 <tr class="odd">
-<td align="left">SATURNE</td>
+<td align="left">BB31</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">1</td>
@@ -1520,7 +1518,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">14</td>
 </tr>
 <tr class="even">
-<td align="left">SSD.BIOBANCA.ASST.PAPA.GIOVANNI.XXIII.BERGAMO</td>
+<td align="left">BB16</td>
 <td align="right">1</td>
 <td align="right">4</td>
 <td align="right">1</td>
@@ -1538,7 +1536,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">20</td>
 </tr>
 <tr class="odd">
-<td align="left">Tropica.Biobank</td>
+<td align="left">BB14</td>
 <td align="right">0</td>
 <td align="right">0</td>
 <td align="right">2</td>
@@ -1556,7 +1554,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">21</td>
 </tr>
 <tr class="even">
-<td align="left">UO.BIOBANCHE.AOUP</td>
+<td align="left">BB24</td>
 <td align="right">0</td>
 <td align="right">4</td>
 <td align="right">0</td>
@@ -1574,7 +1572,7 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <td align="right">15</td>
 </tr>
 <tr class="odd">
-<td align="left">UPO.Biobank</td>
+<td align="left">BB18</td>
 <td align="right">0</td>
 <td align="right">1</td>
 <td align="right">0</td>
@@ -1596,197 +1594,180 @@ for (score in 1:length(punteggi$punteggio_totale)) {
 <pre class="r"><code>knitr::kable(tier_1[order(as.integer(tier_1[,2]), decreasing = T),], format=&quot;markdown&quot;, col.names = c(&quot;Biobanca&quot;, &quot;Punteggio&quot;), row.names = F, caption = &quot;Tier 1&quot;)</code></pre>
 <table>
 <caption>Tier 1</caption>
-<colgroup>
-<col width="87%" />
-<col width="12%" />
-</colgroup>
 <thead>
 <tr class="header">
-<th align="left">Biobanca</th>
-<th align="left">Punteggio</th>
+<th align="right">Biobanca</th>
+<th align="right">Punteggio</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">Biobanca Interistituzionale Multidisciplinare -
-BioBIM</td>
-<td align="left">28</td>
+<td align="right">2</td>
+<td align="right">28</td>
 </tr>
 <tr class="even">
-<td align="left">Biobank for Translational and Digital Medicine</td>
-<td align="left">28</td>
+<td align="right">1</td>
+<td align="right">28</td>
 </tr>
 <tr class="odd">
-<td align="left">Biobanca di ricerca per la medicina personalizzata</td>
-<td align="left">26</td>
+<td align="right">3</td>
+<td align="right">26</td>
 </tr>
 <tr class="even">
-<td align="left">CENTRO DI RISORSE BIOLOGICHE-IRCCS Policlinico San
-Martino -Genova</td>
-<td align="left">26</td>
+<td align="right">4</td>
+<td align="right">26</td>
 </tr>
 <tr class="odd">
-<td align="left">Centro Risorse Biologiche (CRB)</td>
-<td align="left">26</td>
+<td align="right">5</td>
+<td align="right">26</td>
 </tr>
 <tr class="even">
-<td align="left">Biobanca di Ricerca OPBG</td>
-<td align="left">25</td>
+<td align="right">6</td>
+<td align="right">25</td>
 </tr>
 <tr class="odd">
-<td align="left">CRB IRST</td>
-<td align="left">25</td>
+<td align="right">7</td>
+<td align="right">25</td>
 </tr>
 <tr class="even">
-<td align="left">IRCCS ISTITUTO NAZIONALE TUMORI REGINA ELENA BBIRE</td>
-<td align="left">24</td>
+<td align="right">8</td>
+<td align="right">24</td>
 </tr>
 <tr class="odd">
-<td align="left">Biobanca Cardiovascolare BioCor</td>
-<td align="left">23</td>
+<td align="right">10</td>
+<td align="right">23</td>
 </tr>
 <tr class="even">
-<td align="left">CCPP Biobank</td>
-<td align="left">23</td>
+<td align="right">9</td>
+<td align="right">23</td>
 </tr>
 <tr class="odd">
-<td align="left">Biobanca di ricerca AUSL - IRCCS di Reggio Emilia</td>
-<td align="left">22</td>
+<td align="right">12</td>
+<td align="right">22</td>
 </tr>
 <tr class="even">
-<td align="left">Centro Risiorse Biologiche Istituto Ortopedico Rizzoli
-- CRB IOR</td>
-<td align="left">22</td>
+<td align="right">11</td>
+<td align="right">22</td>
 </tr>
 <tr class="odd">
-<td align="left">Biobanca Istituzionale BBI</td>
-<td align="left">21</td>
+<td align="right">13</td>
+<td align="right">21</td>
 </tr>
 <tr class="even">
-<td align="left">Centro Risorse Biologiche/Biobanca POLI-MI</td>
-<td align="left">21</td>
+<td align="right">15</td>
+<td align="right">21</td>
 </tr>
 <tr class="odd">
-<td align="left">Tropica Biobank</td>
-<td align="left">21</td>
+<td align="right">14</td>
+<td align="right">21</td>
 </tr>
 </tbody>
 </table>
 <pre class="r"><code>knitr::kable(tier_2[order(as.integer(tier_2[,2]), decreasing = T),], format=&quot;markdown&quot;, col.names = c(&quot;Biobanca&quot;, &quot;Punteggio&quot;),  row.names = F, caption =  &quot;Tier 2&quot;)</code></pre>
 <table>
 <caption>Tier 2</caption>
-<colgroup>
-<col width="89%" />
-<col width="10%" />
-</colgroup>
 <thead>
 <tr class="header">
-<th align="left">Biobanca</th>
-<th align="left">Punteggio</th>
+<th align="right">Biobanca</th>
+<th align="right">Punteggio</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">Biobanca di ricerca per la medicina personalizzata</td>
-<td align="left">20</td>
+<td align="right">17</td>
+<td align="right">20</td>
 </tr>
 <tr class="even">
-<td align="left">SSD BIOBANCA ASST PAPA GIOVANNI XXIII BERGAMO</td>
-<td align="left">20</td>
+<td align="right">16</td>
+<td align="right">20</td>
 </tr>
 <tr class="odd">
-<td align="left">UPO Biobank</td>
-<td align="left">20</td>
+<td align="right">18</td>
+<td align="right">20</td>
 </tr>
 <tr class="even">
-<td align="left">Biobanca Bruno Boerci di ICS Maugeri</td>
-<td align="left">19</td>
+<td align="right">19</td>
+<td align="right">19</td>
 </tr>
 <tr class="odd">
-<td align="left">BioBanca Istituzionale Bari</td>
-<td align="left">18</td>
+<td align="right">20</td>
+<td align="right">18</td>
 </tr>
 <tr class="even">
-<td align="left">Biobanca SDN</td>
-<td align="left">17</td>
+<td align="right">21</td>
+<td align="right">17</td>
 </tr>
 <tr class="odd">
-<td align="left">BIOGER - Biobanca Istituzionale dell’IRCCS INRCA,
-Ancona</td>
-<td align="left">17</td>
+<td align="right">23</td>
+<td align="right">17</td>
 </tr>
 <tr class="even">
-<td align="left">Humanitas Hospital Biological Resource Center</td>
-<td align="left">17</td>
+<td align="right">22</td>
+<td align="right">17</td>
 </tr>
 <tr class="odd">
-<td align="left">ARC-Net</td>
-<td align="left">15</td>
+<td align="right">27</td>
+<td align="right">15</td>
 </tr>
 <tr class="even">
-<td align="left">Biobank of Veterinary Resources</td>
-<td align="left">15</td>
+<td align="right">28</td>
+<td align="right">15</td>
 </tr>
 <tr class="odd">
-<td align="left">Centro Raccolta Materiale Biologico Alessandria
-Biobank</td>
-<td align="left">15</td>
+<td align="right">25</td>
+<td align="right">15</td>
 </tr>
 <tr class="even">
-<td align="left">CHRIS Biobank</td>
-<td align="left">15</td>
+<td align="right">26</td>
+<td align="right">15</td>
 </tr>
 <tr class="odd">
-<td align="left">UO BIOBANCHE AOUP</td>
-<td align="left">15</td>
+<td align="right">24</td>
+<td align="right">15</td>
 </tr>
 <tr class="even">
-<td align="left">Banca Biologica INMI L.Spallanzani
-(bbmri-eric:ID:IT_1384262955037988)</td>
-<td align="left">14</td>
+<td align="right">29</td>
+<td align="right">14</td>
 </tr>
 <tr class="odd">
-<td align="left">Biobanca IRCCS Istituto Centro San Giovanni di Dio
-Fatebenefratelli (Biobank FBF)</td>
-<td align="left">14</td>
+<td align="right">30</td>
+<td align="right">14</td>
 </tr>
 <tr class="even">
-<td align="left">SATURNE</td>
-<td align="left">14</td>
+<td align="right">31</td>
+<td align="right">14</td>
 </tr>
 <tr class="odd">
-<td align="left">Banca Biologica Oncologica Pediatrica</td>
-<td align="left">13</td>
+<td align="right">35</td>
+<td align="right">13</td>
 </tr>
 <tr class="even">
-<td align="left">Biobanca del CRESM, CRESM Biobank</td>
-<td align="left">13</td>
+<td align="right">34</td>
+<td align="right">13</td>
 </tr>
 <tr class="odd">
-<td align="left">Biobanca del Laboratorio di Genetica Umana</td>
-<td align="left">13</td>
+<td align="right">33</td>
+<td align="right">13</td>
 </tr>
 <tr class="even">
-<td align="left">BIOBANCA DI RICERCA UNIVERSITARIA-UdACAST</td>
-<td align="left">13</td>
+<td align="right">36</td>
+<td align="right">13</td>
 </tr>
 <tr class="odd">
-<td align="left">Cell lines and DNA bank of Genetic Movement Disorders
-and Mitochondrial Diseases</td>
-<td align="left">13</td>
+<td align="right">32</td>
+<td align="right">13</td>
 </tr>
 <tr class="even">
-<td align="left">Centro Risorse Biologiche IGB-CNR (CRB-IGB-CNR)</td>
-<td align="left">13</td>
+<td align="right">37</td>
+<td align="right">13</td>
 </tr>
 <tr class="odd">
-<td align="left">CRB Centro Risorse Biologiche Neurome Biobanking
-Center</td>
-<td align="left">12</td>
+<td align="right">38</td>
+<td align="right">12</td>
 </tr>
 <tr class="even">
-<td align="left">BCU Imaging Biobank</td>
-<td align="left">11</td>
+<td align="right">39</td>
+<td align="right">11</td>
 </tr>
 </tbody>
 </table>
@@ -1795,34 +1776,34 @@ Center</td>
 <caption>Tier 3</caption>
 <thead>
 <tr class="header">
-<th align="left">Biobanca</th>
-<th align="left">Punteggio</th>
+<th align="right">Biobanca</th>
+<th align="right">Punteggio</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">Genetic Biobank of Siena</td>
-<td align="left">9</td>
+<td align="right">40</td>
+<td align="right">9</td>
 </tr>
 <tr class="even">
-<td align="left">da Vinci European BioBank - daVEB</td>
-<td align="left">8</td>
+<td align="right">41</td>
+<td align="right">8</td>
 </tr>
 <tr class="odd">
-<td align="left">Neuromuscular Bank of Tissues and DNA samples</td>
-<td align="left">8</td>
+<td align="right">42</td>
+<td align="right">8</td>
 </tr>
 <tr class="even">
-<td align="left">Neuromuscular Disease Biobank</td>
-<td align="left">8</td>
+<td align="right">43</td>
+<td align="right">8</td>
 </tr>
 <tr class="odd">
-<td align="left">LRPO-ISPRO</td>
-<td align="left">5</td>
+<td align="right">44</td>
+<td align="right">5</td>
 </tr>
 <tr class="even">
-<td align="left">IRCCS-CROB BASILICATA BIOBANK</td>
-<td align="left">3</td>
+<td align="right">45</td>
+<td align="right">3</td>
 </tr>
 </tbody>
 </table>
@@ -1831,18 +1812,18 @@ punteggi$`Nome biobanca` &lt;- row
 punteggi &lt;- punteggi %&gt;%
   relocate(`Nome biobanca`)
 
-wb &lt;- createWorkbook()
-addWorksheet(wb, sheetName = &quot;punteggi_totali&quot;)
-addWorksheet(wb, sheetName = &quot;tier_1&quot;)
-addWorksheet(wb, sheetName = &quot;tier_2&quot;)
-addWorksheet(wb, sheetName = &quot;tier_3&quot;)
-
-writeData(wb, sheet = &quot;punteggi_totali&quot;, punteggi)
-writeData(wb, sheet = &quot;tier_1&quot;, tier_1, colNames = F)
-writeData(wb, sheet = &quot;tier_2&quot;, tier_2, colNames = F)
-writeData(wb, sheet = &quot;tier_3&quot;, tier_3, colNames = F)
-
-saveWorkbook(wb, &quot;punteggi_tiering.xlsx&quot;)</code></pre>
+# wb &lt;- createWorkbook()
+# addWorksheet(wb, sheetName = &quot;punteggi_totali&quot;)
+# addWorksheet(wb, sheetName = &quot;tier_1&quot;)
+# addWorksheet(wb, sheetName = &quot;tier_2&quot;)
+# addWorksheet(wb, sheetName = &quot;tier_3&quot;)
+# 
+# writeData(wb, sheet = &quot;punteggi_totali&quot;, punteggi)
+# writeData(wb, sheet = &quot;tier_1&quot;, tier_1, colNames = F)
+# writeData(wb, sheet = &quot;tier_2&quot;, tier_2, colNames = F)
+# writeData(wb, sheet = &quot;tier_3&quot;, tier_3, colNames = F)
+# 
+# saveWorkbook(wb, &quot;punteggi_tiering.xlsx&quot;)</code></pre>
 <pre class="r"><code>punteggi &lt;- punteggi[order(punteggi$punteggio_totale, decreasing = T),]
 
 terzile_1 &lt;- data.frame(Biobanca = character(), Punteggio = numeric(), stringsAsFactors = F)
@@ -1874,10 +1855,6 @@ for (num in 1:length(punteggi$punteggio_totale)) {
 <pre class="r"><code>knitr::kable(terzile_1[order(as.integer(terzile_1[,2]), decreasing = T),], format=&quot;markdown&quot;, col.names = c(&quot;Biobanca&quot;, &quot;Punteggio&quot;), row.names = F, caption = &quot;Terzile 1&quot;)</code></pre>
 <table>
 <caption>Terzile 1</caption>
-<colgroup>
-<col width="89%" />
-<col width="10%" />
-</colgroup>
 <thead>
 <tr class="header">
 <th align="left">Biobanca</th>
@@ -1886,67 +1863,63 @@ for (num in 1:length(punteggi$punteggio_totale)) {
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">ARC Net</td>
+<td align="left">BB27</td>
 <td align="right">28</td>
 </tr>
 <tr class="even">
-<td align="left">Banca Biologica INMI L Spallanzani bbmri eric ID
-IT_1384262955037988</td>
+<td align="left">BB29</td>
 <td align="right">28</td>
 </tr>
 <tr class="odd">
-<td align="left">Banca Biologica Oncologica Pediatrica</td>
+<td align="left">BB35</td>
 <td align="right">26</td>
 </tr>
 <tr class="even">
-<td align="left">BCU Imaging Biobank</td>
+<td align="left">BB39</td>
 <td align="right">26</td>
 </tr>
 <tr class="odd">
-<td align="left">Biobanca Bruno Boerci di ICS Maugeri</td>
+<td align="left">BB19</td>
 <td align="right">26</td>
 </tr>
 <tr class="even">
-<td align="left">Biobanca Cardiovascolare BioCor</td>
+<td align="left">BB10</td>
 <td align="right">25</td>
 </tr>
 <tr class="odd">
-<td align="left">Biobanca del CRESM CRESM Biobank</td>
+<td align="left">BB34</td>
 <td align="right">25</td>
 </tr>
 <tr class="even">
-<td align="left">Biobanca del Laboratorio di Genetica Umana</td>
+<td align="left">BB33</td>
 <td align="right">24</td>
 </tr>
 <tr class="odd">
-<td align="left">Biobanca di ricerca AUSL IRCCS di Reggio Emilia</td>
+<td align="left">BB12</td>
 <td align="right">23</td>
 </tr>
 <tr class="even">
-<td align="left">Biobanca di Ricerca OPBG</td>
+<td align="left">BB6</td>
 <td align="right">23</td>
 </tr>
 <tr class="odd">
-<td align="left">Biobanca di ricerca per la medicina personalizzata</td>
+<td align="left">BB17</td>
 <td align="right">22</td>
 </tr>
 <tr class="even">
-<td align="left">Biobanca di ricerca per la medicina personalizzata
-1</td>
+<td align="left">BB3</td>
 <td align="right">22</td>
 </tr>
 <tr class="odd">
-<td align="left">BIOBANCA DI RICERCA UNIVERSITARIA UdACAST</td>
+<td align="left">BB36</td>
 <td align="right">21</td>
 </tr>
 <tr class="even">
-<td align="left">Biobanca Interistituzionale Multidisciplinare
-BioBIM</td>
+<td align="left">BB2</td>
 <td align="right">21</td>
 </tr>
 <tr class="odd">
-<td align="left">Biobanca IRCCS Istituto Centro San Giovanni di Dio
-Fatebenefratelli Biobank FBF</td>
+<td align="left">BB30</td>
 <td align="right">21</td>
 </tr>
 </tbody>
@@ -1954,10 +1927,6 @@ Fatebenefratelli Biobank FBF</td>
 <pre class="r"><code>knitr::kable(terzile_2[order(as.integer(terzile_2[,2]), decreasing = T),], format=&quot;markdown&quot;, col.names = c(&quot;Biobanca&quot;, &quot;Punteggio&quot;),  row.names = F, caption =  &quot;Terzile 2&quot;)</code></pre>
 <table>
 <caption>Terzile 2</caption>
-<colgroup>
-<col width="89%" />
-<col width="10%" />
-</colgroup>
 <thead>
 <tr class="header">
 <th align="left">Biobanca</th>
@@ -1966,68 +1935,63 @@ Fatebenefratelli Biobank FBF</td>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">BioBanca Istituzionale Bari</td>
+<td align="left">BB20</td>
 <td align="right">20</td>
 </tr>
 <tr class="even">
-<td align="left">Biobanca Istituzionale BBI</td>
+<td align="left">BB13</td>
 <td align="right">20</td>
 </tr>
 <tr class="odd">
-<td align="left">Biobanca SDN</td>
+<td align="left">BB21</td>
 <td align="right">20</td>
 </tr>
 <tr class="even">
-<td align="left">Biobank for Translational and Digital Medicine</td>
+<td align="left">BB1</td>
 <td align="right">19</td>
 </tr>
 <tr class="odd">
-<td align="left">Biobank of Veterinary Resources</td>
+<td align="left">BB28</td>
 <td align="right">18</td>
 </tr>
 <tr class="even">
-<td align="left">BIOGER Biobanca Istituzionale dell IRCCS INRCA
-Ancona</td>
+<td align="left">BB23</td>
 <td align="right">17</td>
 </tr>
 <tr class="odd">
-<td align="left">CCPP Biobank</td>
+<td align="left">BB9</td>
 <td align="right">17</td>
 </tr>
 <tr class="even">
-<td align="left">Cell lines and DNA bank of Genetic Movement Disorders
-and Mitochondrial Diseases</td>
+<td align="left">BB32</td>
 <td align="right">17</td>
 </tr>
 <tr class="odd">
-<td align="left">CENTRO DI RISORSE BIOLOGICHE IRCCS Policlinico San
-Martino Genova</td>
+<td align="left">BB4</td>
 <td align="right">15</td>
 </tr>
 <tr class="even">
-<td align="left">Centro Raccolta Materiale Biologico Alessandria
-Biobank</td>
+<td align="left">BB25</td>
 <td align="right">15</td>
 </tr>
 <tr class="odd">
-<td align="left">Centro Risiorse Biologiche Istituto Ortopedico Rizzoli
-CRB IOR</td>
+<td align="left">BB11</td>
 <td align="right">15</td>
 </tr>
 <tr class="even">
-<td align="left">Centro Risorse Biologiche CRB</td>
+<td align="left">BB5</td>
 <td align="right">15</td>
 </tr>
 <tr class="odd">
-<td align="left">Centro Risorse Biologiche IGB CNR CRB IGB CNR</td>
+<td align="left">BB37</td>
 <td align="right">15</td>
 </tr>
 <tr class="even">
-<td align="left">Centro Risorse Biologiche Biobanca POLI MI</td>
+<td align="left">BB15</td>
 <td align="right">14</td>
 </tr>
 <tr class="odd">
-<td align="left">CHRIS Biobank</td>
+<td align="left">BB26</td>
 <td align="right">14</td>
 </tr>
 </tbody>
@@ -2043,64 +2007,63 @@ CRB IOR</td>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">CRB Centro Risorse Biologiche Neurome Biobanking
-Center</td>
+<td align="left">BB38</td>
 <td align="right">14</td>
 </tr>
 <tr class="even">
-<td align="left">CRB IRST</td>
+<td align="left">BB7</td>
 <td align="right">13</td>
 </tr>
 <tr class="odd">
-<td align="left">da Vinci European BioBank daVEB</td>
+<td align="left">BB41</td>
 <td align="right">13</td>
 </tr>
 <tr class="even">
-<td align="left">Genetic Biobank of Siena</td>
+<td align="left">BB40</td>
 <td align="right">13</td>
 </tr>
 <tr class="odd">
-<td align="left">Humanitas Hospital Biological Resource Center</td>
+<td align="left">BB22</td>
 <td align="right">13</td>
 </tr>
 <tr class="even">
-<td align="left">IRCCS ISTITUTO NAZIONALE TUMORI REGINA ELENA BBIRE</td>
+<td align="left">BB8</td>
 <td align="right">13</td>
 </tr>
 <tr class="odd">
-<td align="left">IRCCS CROB BASILICATA BIOBANK</td>
+<td align="left">BB45</td>
 <td align="right">13</td>
 </tr>
 <tr class="even">
-<td align="left">LRPO ISPRO</td>
+<td align="left">BB44</td>
 <td align="right">12</td>
 </tr>
 <tr class="odd">
-<td align="left">Neuromuscular Bank of Tissues and DNA samples</td>
+<td align="left">BB42</td>
 <td align="right">11</td>
 </tr>
 <tr class="even">
-<td align="left">Neuromuscular Disease Biobank</td>
+<td align="left">BB43</td>
 <td align="right">9</td>
 </tr>
 <tr class="odd">
-<td align="left">SATURNE</td>
+<td align="left">BB31</td>
 <td align="right">8</td>
 </tr>
 <tr class="even">
-<td align="left">SSD BIOBANCA ASST PAPA GIOVANNI XXIII BERGAMO</td>
+<td align="left">BB16</td>
 <td align="right">8</td>
 </tr>
 <tr class="odd">
-<td align="left">Tropica Biobank</td>
+<td align="left">BB14</td>
 <td align="right">8</td>
 </tr>
 <tr class="even">
-<td align="left">UO BIOBANCHE AOUP</td>
+<td align="left">BB24</td>
 <td align="right">5</td>
 </tr>
 <tr class="odd">
-<td align="left">UPO Biobank</td>
+<td align="left">BB18</td>
 <td align="right">3</td>
 </tr>
 </tbody>
