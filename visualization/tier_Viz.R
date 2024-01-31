@@ -15,19 +15,22 @@ library(gridExtra)
 
 
 
-tier_BB <- data.frame(read_excel("./tiering/punteggi_tiering.xlsx",sheet="abb"))
 
 
-tier_norm_BB <- tier_BB %>%
-			mutate(personale.dedicato = as.numeric(recode(personale.dedicato, "0"="0","1"="0.25","4"="1")),
-				 ontologie = as.numeric(recode(ontologie, "0"="0","1"="0.33","3"="1")),
-				 LIMS = as.numeric(recode(LIMS, "0"="0","1"="0.125","8"="1")),
-				 Infrastruttura.IT = as.numeric(recode(Infrastruttura.IT, "0"="0","1"="0.5", "2"="1")),
-				 Componenti.IT = as.numeric(recode(Componenti.IT, "0"="0","1"="0.5", "2"="1")), 
-				 DWH = as.numeric(recode(DWH, "0"="0", "2"="1")),
-				 annotazioni = as.numeric(recode(annotazioni, "0"="0","1"="0.5", "2"="1")),
-				 consenso.informato = as.numeric(recode(consenso.informato, "0"="0", "3"="1"))
-				)
+tier_BB <- data.frame(read_excel("./data/punteggi_tiering.xlsx",1))
+
+tier_norm_BB <- round(tier_BB %>%
+			mutate(personale.dedicato = personale.dedicato/max(personale.dedicato),
+				 ontologie = ontologie/max(ontologie),
+				 LIMS = LIMS/max(LIMS),
+				 Infrastruttura.IT = Infrastruttura.IT/max(Infrastruttura.IT),
+				 Componenti.IT = Componenti.IT/max(Componenti.IT), 
+				 DWH = DWH/max(DWH),
+				 annotazioni = annotazioni/max(annotazioni),
+				 consenso.informato = consenso.informato/max(consenso.informato)
+			),2)
+
+
 
 dimnames(tier_norm_BB)[[2]]<-c(
 "biobank",
@@ -45,9 +48,6 @@ dimnames(tier_norm_BB)[[2]]<-c(
 "annotations",
 "clinical_data_availability",
 "informed_consent",
-"personnel",
-"infrastructure",
-"data",
 "punteggio_totale"
 )
 
@@ -64,10 +64,13 @@ tier_norm_BB$tier_quart <- ifelse(tier_norm_BB$punt_norm < 3.5, "Low",
                        		   ifelse(tier_norm_BB$punt_norm < 7, "Starting",
 							ifelse(tier_norm_BB$punt_norm < 10.5, "Advanced", "Mature")))
 
+head(tier_norm_BB)
+
 dati<-pivot_longer(tier_norm_BB, IT_head:informed_consent,names_to="facilities",values_to="score")
 dati<-data.frame(dati,macro_areas=c(rep(c(rep("personnel",4),rep("infrastructure",6),rep("data",4)),nrow(tier_norm_BB))))
 dati$tier <- ifelse(dati$punteggio_totale < 11, "Starting",
                        ifelse(dati$punteggio_totale < 21, "Advanced", "Mature"))
+dati
 
 
 
@@ -75,14 +78,12 @@ dati$tier <- ifelse(dati$punteggio_totale < 11, "Starting",
 
 
 ####################################################################################
-################################### PLOTS ##########################################
+###################################### PLOTS  ######################################
 ####################################################################################
+
 
 
 #######HEATMAP
-
-
-
 
 nuovi_nomi_variabili <- c(
 "IT head",
@@ -102,7 +103,7 @@ nuovi_nomi_variabili <- c(
 
 
 dati$nuova_variabile <- factor(dati$facilities, levels = unique(dati$facilities), labels = nuovi_nomi_variabili)
-
+head(dati,40)
 
 p2<-ggplot(dati, aes(x = biobank, y = nuova_variabile, fill = score)) +
    geom_tile(color = "black", linewidth = 0.7) +
@@ -121,6 +122,14 @@ p2<-ggplot(dati, aes(x = biobank, y = nuova_variabile, fill = score)) +
          legend.title = element_text(face = "bold"),
          strip.placement = "outside") +
    facet_grid(rows = vars(macro_areas), switch = "y", scale = "free_y")
+
+ggsave(filename = "heatmap.png", 
+	 plot = p2 , 
+	 device = "png", 
+	 dpi = 300, 
+	 height = 4,
+	 width = 11)
+
 
 
 
@@ -151,16 +160,30 @@ p1<-ggplot(dati)+
 		 panel.spacing.x = unit(-3, "lines"))
 
 
+ggsave(filename = "density.png", 
+	 plot = p1 , 
+	 device = "png", 
+	 dpi = 300, 
+	 height = 4,
+	 width = 5)
 
 
-##RADARPLOT
+
+
+
+
+			
 
 lista_tier <- tier_norm_BB %>% group_split(tier)
+
 col_median1 <- apply(lista_tier[[1]][,c(2:15)], 2, median)
 col_median2 <- apply(lista_tier[[2]][,c(2:15)], 2, median)
 col_median3 <- apply(lista_tier[[3]][,c(2:15)], 2, median)
 col_summary <- data.frame(tier=c("Starting","Advanced","Mature"),t(data.frame(Base = col_median1, Medium = col_median3, High = col_median2)))
 
+
+
+##RADARPLOT
 
 for(i in 1:nrow(col_summary)) {
   p4 <- ggradar(
@@ -208,7 +231,18 @@ for(i in 1:nrow(col_summary)) {
 	legend.position = "none",
       plot.margin = margin(20, 20, 20, 20, "pt")) +
     labs(y = paste("Biobanks median score:"))  
+
+ggsave(filename = paste("radar_tier",i,".png"), 
+	 plot = p4 , 
+	 device = "png", 
+	 dpi = 300, 
+	 height = 3,
+	 width = 3.9)
 }
+
+
+
+
 
 
 
@@ -236,4 +270,5 @@ tabella$widths <- unit(tabella$widths + unit(0.5, "cm"), "cm")
 
 p5<-grid.arrange(tabella, nrow = 1)
 
+ggsave("arranged_plot.png", p5, dpi=300, device = "png",height = 5,width = 4)
 

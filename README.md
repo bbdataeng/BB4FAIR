@@ -25,4 +25,8 @@ conda install -y -c conda-forge r-dplyr r-ggplot2 r-rmarkdown r-readr r-tidyvers
 Rscript -e "rmarkdown::render('quantitative_tiering.Rmd')"
 ```
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> aa957660a4c1fe741dcdf9d84ee8f1d63f19e596
 

@@ -1,6 +1,6 @@
 ---
-title: "Tiering survey"
-author: "Federica"
+title: "Tiering Survey"
+author: "Federica Rossi"
 date: "2023-11-13"
 output: 
   html_document:
@@ -22,11 +22,11 @@ library(stringr)
 library("writexl")
 
 #setwd("/Users/matteo/OneDrive - CNR/bbmri-it-pnrr/survey-wp4-tiering/tiering")
-setwd("~/Documents/BBMRI/Survey_BB")
-quant <- read_excel("data/quantitativa.xlsx", sheet = "razionale")
+setwd("C:/Users/Antonella/Desktop/bb4FAIR")
+quant <- read_excel("./data/quantitativa.xlsx", sheet = "razionale")
 quant <- quant[1:14,1:6]
 quant <- quant[order(quant$id), ]
-survey <- read_excel("231206-risposte.xlsx")
+survey <- read_excel("./data/231206-risposte.xlsx")
 survey <- as.data.frame(survey[,c(7:44)]) 
 
 ```
