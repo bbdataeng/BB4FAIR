@@ -20,13 +20,17 @@ dplyr ggplot2 rmarkdown readr tidyverse readxl formattable tidyr RColorBrewer vi
 ```shell
 conda install -y -c conda-forge r-dplyr r-ggplot2 r-rmarkdown r-readr r-tidyverse r-readxl r-formattable r-tidyr r-rcolorbrewer r-viridis r-fmsb r-stringr r-officer r-unikn
 ```
+
+### Quantitative Tiering
+
 #### how to compile from terminal 
 ```shell
 Rscript -e "rmarkdown::render('quantitative_tiering.Rmd')"
 ```
 
-<<<<<<< HEAD
-=======
+### Visualization
+![Tier_Viz](https://github.com/bbdataeng/BB4FAIR/assets/51079644/d4a595f5-ffda-424c-8810-e89d03330cfc)
 
->>>>>>> aa957660a4c1fe741dcdf9d84ee8f1d63f19e596
 
+### Shiny App
+https://bbdataeng.shinyapps.io/bb4FAIR_app/
