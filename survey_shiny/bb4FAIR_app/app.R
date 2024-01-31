@@ -15,13 +15,14 @@ library(tibble)
 library(hrbrthemes)
 library(grid)
 library(gridExtra)
-
+library(DT)
 
 
 
 # Load Data ---------------------------------------------------------------
 # tier_BB <- read_xlsx("data/punteggi_tiering.xlsx", sheet = "abb")    	
 scores <- read_xlsx("./punteggi_tiering.xlsx", sheet = "punteggi_totali")
+colnames(scores)[1] <- "BB_ID"
 info_area <- read_xlsx("./quantitativa.xlsx", sheet = "razionale")
 # questions <- read_xlsx("./quantitativa.xlsx", sheet = 4)
 
@@ -33,62 +34,52 @@ macroareas <- info_area[1:14,c("domanda","area")]
 
 
 
-
-
-
 # User Interface ----------------------------------------------------------
-
-
 ui <- 
   ## navigation bar
   navbarPage(
     title = 'Digital Maturity Survey',
-    header = "test",
+    header = "TEST",
     tabPanel('Scores',     
  
   fluidPage(
   ## new row in the UI for selectInputs
   fluidRow(
-    column(4,
-           selectInput("bb_name",
+	     column(4,selectInput("bb_name",
                        "Biobank ID:",
                        c("All",
-                         unique(as.character(scores$abb))))
-    ),
-    column(4,
-           selectInput("tier",
+                         unique(as.character(scores$BB_ID))))),
+           column(4,selectInput("tier",
                        "Tier:",
                        c("All",
-                         unique(as.character(scores$tier))))
-    ),
-    column(4,
-           selectInput("macroarea",
+                         unique(as.character(scores$tier))))),
+           column(4,selectInput("macroarea",
                        "Macro-area:",
                        c("All",
-                         unique(as.character(macroareas$area))))
-    )
+                         unique(as.character(macroareas$area)))
+		))
   ),
-  # Create a new row for the table.
+  
   DT::dataTableOutput("scores")
+
 )),
+
 tabPanel('Questions', DT::dataTableOutput('questions')),
 tabPanel('Visualization',  
        fluidPage(
-        ## new row in the UI for selectInputs
         fluidRow(
-           column(4,
-                  plotOutput("heatmap")
-         ),
-         column(4,
-                plotOutput("radars")
-         ),
-         column(4,
-                plotOutput("legend")
-         ),
-         column(4,
-                plotOutput("density")
-         )))
+           column(3,plotOutput("density")),
+           column(3,plotOutput("heatmap"))),
+        fluidRow(
+	     column(2,plotOutput("radar1")),
+           column(2,plotOutput("radar2")),
+           column(2,plotOutput("radar3")),
+           column(2,plotOutput("legend"))
+		    ))
 ))
+
+
+
 
 # Server ------------------------------------------------------------------
 server <- function(input, output) {
@@ -96,46 +87,40 @@ server <- function(input, output) {
   # filter data based on selections
   output$scores <- DT::renderDataTable(DT::datatable({
     data <- scores
+    data$BB_ID <- paste0("BB", data$BB_ID)
     if (input$bb_name != "All") {
-      data <- data[data$abb == input$bb_name,]
+      data <- data[data$BB_ID == input$bb_name,]
     }
     if (input$tier != "All") {
       data <- data[data$tier == input$tier,]
     }
     if (input$macroarea != "All") {
-      selected_cols <- c(abb,
+      selected_cols <- c("BB_ID",
                          macroareas$domanda[macroareas$area %in% c(input$macroarea)])
       data_filtered <- data[, colnames(data) %in%  selected_cols]
-      data_filtered$punteggio_area <- apply(data_filtered[,-1], 1, sum)
-      data_filtered$punteggio_totale <- data$punteggio_totale
+      data_filtered$area_score <- apply(data_filtered[,-1], 1, sum)
+      data_filtered$total_score <- data$punteggio_totale
       data <- data_filtered
     }
     data
   }))
   
-  # output$questions <-DT::renderDataTable(DT::datatable({
-  #   data <- questions}))
-  
+
+  #preprocessing data long form for plots
+
+  tier_norm_BB <- round(data.frame(scores[,1:16]) %>%
+			mutate(personale.dedicato = personale.dedicato/max(personale.dedicato),
+				 ontologie = ontologie/max(ontologie),
+				 LIMS = LIMS/max(LIMS),
+				 Infrastruttura.IT = Infrastruttura.IT/max(Infrastruttura.IT),
+				 Componenti.IT = Componenti.IT/max(Componenti.IT), 
+				 DWH = DWH/max(DWH),
+				 annotazioni = annotazioni/max(annotazioni),
+				 consenso.informato = consenso.informato/max(consenso.informato)
+			),2)
 
 
 
-
-  tier_BB <- cbind(data.frame(apply(scores[,1:15], 2, as.factor)), scores[,16])
-  
-  tier_norm_BB <- tier_BB %>%
-  			mutate(personale.dedicato = as.numeric(recode(personale.dedicato, "0"="0","1"="0.25","4"="1")),
-  				 ontologie = as.numeric(recode(ontologie, "0"="0","1"="0.33","3"="1")),
-  				 LIMS = as.numeric(recode(LIMS, "0"="0","1"="0.125","8"="1")),
-  				 Infrastruttura.IT = as.numeric(recode(Infrastruttura.IT, "0"="0","1"="0.5", "2"="1")),
-  				 Componenti.IT = as.numeric(recode(Componenti.IT, "0"="0","1"="0.5", "2"="1")), 
-  				 DWH = as.numeric(recode(DWH, "0"="0", "2"="1")),
-  				 annotazioni = as.numeric(recode(annotazioni, "0"="0","1"="0.5", "2"="1")),
-  				 consenso.informato = as.numeric(recode(consenso.informato, "0"="0", "3"="1"))
-  			)
-  tier_norm_BB <- data.frame(apply(tier_norm_BB, 2, as.numeric))
-  
-  dati<-pivot_longer(tier_norm_BB, referente.IT:punteggio_totale,names_to="facilities",values_to="score")
-  
   dimnames(tier_norm_BB)[[2]]<-c(
   "biobank",
   "IT_head",
@@ -152,32 +137,24 @@ server <- function(input, output) {
   "annotations",
   "clinical_data_availability",
   "informed_consent",
-  "personnel",
-  "infrastructure",
-  "data",
   "punteggio_totale"
   )
   
   
+
   tier_norm_BB$punt_norm<-apply(tier_norm_BB[,c(2:15)],1,sum)
-  
-  tier_norm_BB$tier <- ifelse(tier_norm_BB$punteggio_totale < 11, "Base",
-  					ifelse(tier_norm_BB$punteggio_totale < 21, "Intermediate", "Advance"))
-  
-  tier_norm_BB$tier_norm <- ifelse(tier_norm_BB$punt_norm < 4.62, "Base",
-                         		   ifelse(tier_norm_BB$punt_norm < 9.24, "Intermediate", "Advance"))
-  
-  tier_norm_BB$tier_quart <- ifelse(tier_norm_BB$punt_norm < 3.5, "Low",
-                         		   ifelse(tier_norm_BB$punt_norm < 7, "Base",
-  							ifelse(tier_norm_BB$punt_norm < 10.5, "Intermediate", "Advance")))
-  
-  head(tier_norm_BB)
-  
+
+  tier_norm_BB$tier <- ifelse(tier_norm_BB$punteggio_totale < 11, "Starting",
+					ifelse(tier_norm_BB$punteggio_totale < 21, "Advanced", "Mature"))
   dati<-pivot_longer(tier_norm_BB, IT_head:informed_consent,names_to="facilities",values_to="score")
   dati<-data.frame(dati,macro_areas=c(rep(c(rep("personnel",4),rep("infrastructure",6),rep("data",4)),nrow(tier_norm_BB))))
-  dati$tier <- ifelse(dati$punteggio_totale < 11, "Base",
-                         ifelse(dati$punteggio_totale < 21, "Intermediate", "Advance"))
+  dati$tier <- ifelse(dati$punteggio_totale < 11, "Starting",
+                       ifelse(dati$punteggio_totale < 21, "Advanced", "Mature"))
   
+  
+
+  # preprocessing heatmap plot
+
   nuovi_nomi_variabili <- c(
   "IT head",
   "dedicated personnel",
@@ -193,9 +170,7 @@ server <- function(input, output) {
   "annotations",
   "clinical data availability",
   "informed consent")
-  
-  
-  
+   
   dati$nuova_variabile <- factor(dati$facilities, levels = unique(dati$facilities), labels = nuovi_nomi_variabili)
   
   # preprocessing radar plot
@@ -208,10 +183,11 @@ server <- function(input, output) {
   
   
   # preprocessing legend
+
   etichette<-c("ITh","pers","onto","CDM","BIMS","DM","ITi","store","ITc","DWH","regis","anno","clin","IC")
-  
+
   etichette <- paste0("    ", etichette)
-  
+
   mytheme <- ttheme_default(
     core = list(
       fg_params = list(hjust = 0, x = 0.1, fontsize = 12),
@@ -222,32 +198,12 @@ server <- function(input, output) {
       padding = unit(c(0.5, 0.5), "cm")
     )
   )
-  
+
   tabella <- tableGrob(data.frame(etichette = as.character(etichette), nuova_variabile = as.character(unique(dati$nuova_variabile))), 
                        theme = mytheme, cols = c("", "record"))
   tabella$widths <- unit(tabella$widths + unit(0.5, "cm"), "cm")
-  
-  
-  output$heatmap <- renderPlot({
-   ggplot(dati, aes(x = biobank, y = nuova_variabile, fill = score)) +
-     geom_tile(color = "black", linewidth = 0.7) +
-     scale_fill_gradient(low="#244270", high="#EB5E00") +
-     scale_y_discrete(position = "right",name="facilities") +
-     theme(panel.background = element_blank(),
-           axis.text.x = element_text(face = "bold", size = 9),  
-           axis.text.y = element_text(face = "bold", size = 9, hjust = 1),
-           axis.text.y.right = element_text(face = "bold", size = 9),
-           # axis.ticks.y.right = element_line( margin = margin(l = -10)),
-           axis.title.y.right = element_text(face = "bold", margin = margin(l = 10)),
-           axis.title.x = element_text(face = "bold"),
-           axis.title.y = element_text(face = "bold"),
-           strip.text = element_text(face = "bold", size = 10),
-           legend.text = element_text(face = "bold"),
-           legend.title = element_text(face = "bold"),
-           strip.placement = "outside") +
-     facet_grid(rows = vars(macro_areas), switch = "y", scale = "free_y")}, width = 1056, height = 384)
-     # width = 10560, height = 3840, res = 300)
-  
+
+
   
   output$density <- renderPlot({ggplot(dati)+
       geom_density(aes(x = score), fill="#244270", alpha = 0.8) +
@@ -270,25 +226,180 @@ server <- function(input, output) {
             axis.ticks.x = element_line(color = "grey30"),
             axis.line.x = element_blank(),
             axis.ticks.y.right = element_line(color = "grey30"),
-            panel.spacing.x = unit(-3, "lines"))})
+            panel.spacing.x = unit(-3, "lines"))}, width = 384, height = 384)
   
   
+  output$heatmap <- renderPlot({
+   ggplot(dati, aes(x = biobank, y = nuova_variabile, fill = score)) +
+     geom_tile(color = "black", linewidth = 0.7) +
+     scale_fill_gradient(low="#244270", high="#EB5E00") +
+     scale_y_discrete(position = "right",name="facilities") +
+     theme(panel.background = element_blank(),
+           axis.text.x = element_text(face = "bold", size = 9),  
+           axis.text.y = element_text(face = "bold", size = 9, hjust = 1),
+           axis.text.y.right = element_text(face = "bold", size = 9),
+           # axis.ticks.y.right = element_line( margin = margin(l = -10)),
+           axis.title.y.right = element_text(face = "bold", margin = margin(l = 10)),
+           axis.title.x = element_text(face = "bold"),
+           axis.title.y = element_text(face = "bold"),
+           strip.text = element_text(face = "bold", size = 10),
+           legend.text = element_text(face = "bold"),
+           legend.title = element_text(face = "bold"),
+           strip.placement = "outside") +
+     facet_grid(rows = vars(macro_areas), switch = "y", scale = "free_y")}, width = 1056, height = 384)
   
+ output$radar1 <- renderPlot({
+   ggradar(
+    col_summary[1,],
+    base.size = 8,
+    font.radar = "Arial Black",
+    values.radar = c("0%", "50%", "100%"),
+    axis.labels = c("ITh","pers","onto","CDM","BIMS","DM","ITi","store","ITc","DWH","regis","anno","clin","IC"),  
+    plot.extent.x.sf = 1,
+    plot.extent.y.sf = 1.2,
+    label.centre.y = FALSE,
+    grid.line.width = 0.3,
+    grid.label.size = 3,
+    label.gridline.min = TRUE,
+    label.gridline.mid = TRUE,
+    label.gridline.max = TRUE,
+    axis.label.offset = 1.1,
+    axis.label.size = 4,
+    axis.line.colour = "#244270",
+    group.line.width = 1.1,
+    group.point.size = 2,
+    group.colours = "#EC6707",
+    background.circle.colour = "#244270",
+    background.circle.transparency = 0.1,
+    plot.legend = FALSE,
+    legend.title = "",
+    plot.title = paste(col_summary[1,1],"Tier" ),
+    legend.text.size = 10,
+    legend.position = "bottom",
+    fill = TRUE,
+    fill.alpha = 0.4) +
+    theme_classic(base_family='Arial Black') +
+    theme(
+      axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.title.x = element_text(face = "bold"),
+      axis.title.y = element_text(face = "bold", size = 12),
+      strip.text = element_text(face = "bold"),
+      plot.title = element_text(size = 14, face = "bold", hjust = 0.5), 
+      axis.text = element_text(face = "bold"),
+      axis.ticks.y = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.line.x = element_blank(),
+      axis.line.y = element_blank(),
+	legend.position = "none",
+      plot.margin = margin(20, 20, 20, 20, "pt")) +
+    labs(y = paste("Biobanks median score:"))}, width = 300, height = 300)
   
+output$radar2 <- renderPlot({
+   ggradar(
+    col_summary[2,],
+    base.size = 8,
+    font.radar = "Arial Black",
+    values.radar = c("0%", "50%", "100%"),
+    axis.labels = c("ITh","pers","onto","CDM","BIMS","DM","ITi","store","ITc","DWH","regis","anno","clin","IC"),  
+    plot.extent.x.sf = 1,
+    plot.extent.y.sf = 1.2,
+    label.centre.y = FALSE,
+    grid.line.width = 0.3,
+    grid.label.size = 3,
+    label.gridline.min = TRUE,
+    label.gridline.mid = TRUE,
+    label.gridline.max = TRUE,
+    axis.label.offset = 1.1,
+    axis.label.size = 4,
+    axis.line.colour = "#244270",
+    group.line.width = 1.1,
+    group.point.size = 2,
+    group.colours = "#EC6707",
+    background.circle.colour = "#244270",
+    background.circle.transparency = 0.1,
+    plot.legend = FALSE,
+    legend.title = "",
+    plot.title = paste(col_summary[2,1],"Tier" ),
+    legend.text.size = 10,
+    legend.position = "bottom",
+    fill = TRUE,
+    fill.alpha = 0.4) +
+    theme_classic(base_family='Arial Black') +
+    theme(
+      axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.title.x = element_text(face = "bold"),
+      axis.title.y = element_text(face = "bold", size = 12),
+      strip.text = element_text(face = "bold"),
+      plot.title = element_text(size = 14, face = "bold", hjust = 0.5), 
+      axis.text = element_text(face = "bold"),
+      axis.ticks.y = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.line.x = element_blank(),
+      axis.line.y = element_blank(),
+	legend.position = "none",
+      plot.margin = margin(20, 20, 20, 20, "pt")) +
+    labs(y = paste("Biobanks median score:"))}, width = 300, height = 300)
+  
+output$radar3 <- renderPlot({
+   ggradar(
+    col_summary[3,],
+    base.size = 8,
+    font.radar = "Arial Black",
+    values.radar = c("0%", "50%", "100%"),
+    axis.labels = c("ITh","pers","onto","CDM","BIMS","DM","ITi","store","ITc","DWH","regis","anno","clin","IC"),  
+    plot.extent.x.sf = 1,
+    plot.extent.y.sf = 1.2,
+    label.centre.y = FALSE,
+    grid.line.width = 0.3,
+    grid.label.size = 3,
+    label.gridline.min = TRUE,
+    label.gridline.mid = TRUE,
+    label.gridline.max = TRUE,
+    axis.label.offset = 1.1,
+    axis.label.size = 4,
+    axis.line.colour = "#244270",
+    group.line.width = 1.1,
+    group.point.size = 2,
+    group.colours = "#EC6707",
+    background.circle.colour = "#244270",
+    background.circle.transparency = 0.1,
+    plot.legend = FALSE,
+    legend.title = "",
+    plot.title = paste(col_summary[3,1],"Tier" ),
+    legend.text.size = 10,
+    legend.position = "bottom",
+    fill = TRUE,
+    fill.alpha = 0.4) +
+    theme_classic(base_family='Arial Black') +
+    theme(
+      axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.title.x = element_text(face = "bold"),
+      axis.title.y = element_text(face = "bold", size = 12),
+      strip.text = element_text(face = "bold"),
+      plot.title = element_text(size = 14, face = "bold", hjust = 0.5), 
+      axis.text = element_text(face = "bold"),
+      axis.ticks.y = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.line.x = element_blank(),
+      axis.line.y = element_blank(),
+	legend.position = "none",
+      plot.margin = margin(20, 20, 20, 20, "pt")) +
+    labs(y = paste("Biobanks median score:"))}, width = 300, height = 300)
+  
+
+
+output$legend <- renderPlot({
+grid.arrange(tabella, nrow = 1)}, width = 300, height = 350)
 
 
 }
+
+
 
 # Run Shiny App -----------------------------------------------------------
 shinyApp(ui = ui, server = server)
 
 
-
-## Istruzioni per il deployment -------------------------------------------
-# library(rsconnect)
-# 
-# rsconnect::setAccountInfo(name='bbdataeng',
-#                           token='1A6630C592D9A63FD1C8D65C0F08F390',
-#                           secret='SLd4aCbiTMTzLbzh1QVn2/egA2b0H5JpLay6/iSG')
-# 
-# rsconnect::deployApp('bb4FAIR_app')

@@ -3,7 +3,7 @@
 ## Introduction
 Biobanks must ensure a fully engineered and digitalized process towards data FAIRification. To this aim, the first step is to assess the current digitalization status with quantitative metrics, particularly challenging given the multi-faceted regulatory and logistics aspects of biobanking.
 
-BB4FAIR is a Biobanking digital assessment maturity framework, implemented in the #NextGenerationEu “Strenghtening BBMRI.it” project. 
+BB4FAIR is a Biobanking digital maturity framework, implemented in the #NextGenerationEu “Strenghtening BBMRI.it” project. 
 It comprises of:
 1) a survey with 38 questions divided in three macro areas, namely IT infrastructure, personnel, and data annotation richness
 2) an automated R system to analyze and produce data visualization based on the survey results.
