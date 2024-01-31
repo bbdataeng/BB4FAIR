@@ -23,7 +23,7 @@ library("writexl")
 
 #setwd("/Users/matteo/OneDrive - CNR/bbmri-it-pnrr/survey-wp4-tiering/tiering")
 setwd("~/Documents/BBMRI/Survey_BB")
-quant <- read_excel("quantitativa.xlsx", sheet = "razionale")
+quant <- read_excel("data/quantitativa.xlsx", sheet = "razionale")
 quant <- quant[1:14,1:6]
 quant <- quant[order(quant$id), ]
 survey <- read_excel("231206-risposte.xlsx")
