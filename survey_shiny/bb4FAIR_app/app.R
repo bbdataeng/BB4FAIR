@@ -39,7 +39,6 @@ ui <-
   ## navigation bar
   navbarPage(
     title = 'Digital Maturity Survey',
-    header = "TEST",
     tabPanel('Scores',     
  
   fluidPage(
