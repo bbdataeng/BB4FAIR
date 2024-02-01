@@ -48,16 +48,16 @@ ui <-
 	     column(4,selectInput("bb_name",
                        "Biobank ID:",
                        c("All",
-                         unique(as.character(scores$BB_ID))))),
+                         unique(as.character(paste0("BB",scores$BB_ID)))))),
            column(4,selectInput("tier",
                        "Tier:",
                        c("All",
                          unique(as.character(scores$tier))))),
-           column(4,selectInput("macroarea",
-                       "Macro-area:",
-                       c("All",
-                         unique(as.character(macroareas$area)))
-		))
+           column(4,selectizeInput("macroarea", 
+                                   "Macro-areas:", 
+                                   choices = c("All", unique(as.character(macroareas$area))),
+                                multiple = TRUE)
+		)
   ),
   
   DT::dataTableOutput("scores")
@@ -87,22 +87,33 @@ server <- function(input, output) {
   # filter data based on selections
   output$scores <- DT::renderDataTable(DT::datatable({
     data <- scores
+    names(data)[names(data) == 'punteggio_totale'] <- 'total_score'
     data$BB_ID <- paste0("BB", data$BB_ID)
+    
     if (input$bb_name != "All") {
       data <- data[data$BB_ID == input$bb_name,]
     }
     if (input$tier != "All") {
       data <- data[data$tier == input$tier,]
     }
-    if (input$macroarea != "All") {
-      selected_cols <- c("BB_ID",
-                         macroareas$domanda[macroareas$area %in% c(input$macroarea)])
-      data_filtered <- data[, colnames(data) %in%  selected_cols]
-      data_filtered$area_score <- apply(data_filtered[,-1], 1, sum)
-      data_filtered$total_score <- data$punteggio_totale
-      data <- data_filtered
-    }
+ 
+    if (!"All" %in% input$macroarea & {!is.null(input$macroarea)}) {
+      final_cols <- c("BB_ID")
+      macro_scores <- c()
+      
+      for (selected_macroarea in input$macroarea) {
+        colname <- paste0(selected_macroarea, "_score")
+        macro_scores <- c(macro_scores, colname)
+        # sum for the selected macroarea
+        selected_cols <- macroareas$domanda[macroareas$area %in% selected_macroarea]
+        final_cols <- c(final_cols, selected_cols)
+        data[[colname]] <- rowSums(data[, selected_cols])}
+      
+    data <- data[, c(final_cols, "tier", macro_scores, "total_score")]
+    }else{data <- data}
+
     data
+    
   }))
   
 
