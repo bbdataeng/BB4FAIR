@@ -19,6 +19,8 @@ library(DT)
 
 
 
+
+
 # Load Data ---------------------------------------------------------------
 # tier_BB <- read_xlsx("data/punteggi_tiering.xlsx", sheet = "abb")    	
 scores <- read_xlsx("./punteggi_tiering.xlsx", sheet = "punteggi_totali")
@@ -28,8 +30,8 @@ info_area <- read_xlsx("./quantitativa.xlsx", sheet = "razionale")
 
 
 ## add tiers
-scores$tier <- ifelse(scores$punteggio_totale > 20, "Advanced", 
-                    ifelse(scores$punteggio_totale < 11, "Base", "Intermediate"))
+scores$tier <- ifelse(scores$punteggio_totale > 20, "Mature", 
+                    ifelse(scores$punteggio_totale < 11, "Starting", "Advanced"))
 macroareas <- info_area[1:14,c("domanda","area")]
 
 
@@ -70,10 +72,10 @@ tabPanel('Visualization',
            column(3,plotOutput("density")),
            column(3,plotOutput("heatmap"))),
         fluidRow(
-	     column(2,plotOutput("radar1")),
-           column(2,plotOutput("radar2")),
-           column(2,plotOutput("radar3")),
-           column(2,plotOutput("legend"))
+	     column(3,plotOutput("radar1")),
+           column(3,plotOutput("radar2")),
+           column(3,plotOutput("radar3")),
+           column(3,plotOutput("legend"))
 		    ))
 ))
 
@@ -150,14 +152,16 @@ server <- function(input, output) {
   "punteggio_totale"
   )
   
-  
+
 
   tier_norm_BB$punt_norm<-apply(tier_norm_BB[,c(2:15)],1,sum)
 
   tier_norm_BB$tier <- ifelse(tier_norm_BB$punteggio_totale < 11, "Starting",
 					ifelse(tier_norm_BB$punteggio_totale < 21, "Advanced", "Mature"))
   dati<-pivot_longer(tier_norm_BB, IT_head:informed_consent,names_to="facilities",values_to="score")
-  dati<-data.frame(dati,macro_areas=c(rep(c(rep("personnel",4),rep("infrastructure",6),rep("data",4)),nrow(tier_norm_BB))))
+  dati<-data.frame(dati,
+			 macro_areas=c(rep(c(rep("personnel",4),"infrastructure","data",rep("infrastructure",4),rep("data",4)),
+			 nrow(tier_norm_BB))))
   dati$tier <- ifelse(dati$punteggio_totale < 11, "Starting",
                        ifelse(dati$punteggio_totale < 21, "Advanced", "Mature"))
   
@@ -189,12 +193,12 @@ server <- function(input, output) {
   col_median1 <- apply(lista_tier[[1]][,c(2:15)], 2, median)
   col_median2 <- apply(lista_tier[[2]][,c(2:15)], 2, median)
   col_median3 <- apply(lista_tier[[3]][,c(2:15)], 2, median)
-  col_summary <- data.frame(tier=c("Starting","Advanced","Mature"),t(data.frame(Base = col_median1, Medium = col_median3, High = col_median2)))
-  
+  col_summary <- data.frame(tier=c("Starting","Advanced","Mature"),t(data.frame(Base = col_median3, Intermediate = col_median1, High = col_median2)))
+  col_summary <- cbind(col_summary[,-c(7,13:15)],col_summary[,c(7,13:15)])
   
   # preprocessing legend
 
-  etichette<-c("ITh","pers","onto","CDM","BIMS","DM","ITi","store","ITc","DWH","regis","anno","clin","IC")
+  etichette<-c("ITh","pers","onto","CDM","BIMS","ITi","store","ITc","DWH","regis","DM","anno","clin","IC")
 
   etichette <- paste0("    ", etichette)
 
@@ -209,12 +213,15 @@ server <- function(input, output) {
     )
   )
 
-  tabella <- tableGrob(data.frame(etichette = as.character(etichette), nuova_variabile = as.character(unique(dati$nuova_variabile))), 
+  tabella <- tableGrob(data.frame(etichette = as.character(etichette), 
+					    nuova_variabile = c(as.character(unique(dati$nuova_variabile)[1:5]),
+									as.character(unique(dati$nuova_variabile)[7:11]),
+									as.character(unique(dati$nuova_variabile)[c(6,12:14)]))),					
                        theme = mytheme, cols = c("", "record"))
   tabella$widths <- unit(tabella$widths + unit(0.5, "cm"), "cm")
 
 
-  
+
   output$density <- renderPlot({ggplot(dati)+
       geom_density(aes(x = score), fill="#244270", alpha = 0.8) +
       facet_grid(macro_areas~., switch = "y")+
@@ -237,8 +244,8 @@ server <- function(input, output) {
             axis.line.x = element_blank(),
             axis.ticks.y.right = element_line(color = "grey30"),
             panel.spacing.x = unit(-3, "lines"))}, width = 384, height = 384)
-  
-  
+ 
+ 
   output$heatmap <- renderPlot({
    ggplot(dati, aes(x = biobank, y = nuova_variabile, fill = score)) +
      geom_tile(color = "black", linewidth = 0.7) +
@@ -247,8 +254,8 @@ server <- function(input, output) {
      theme(panel.background = element_blank(),
            axis.text.x = element_text(face = "bold", size = 9),  
            axis.text.y = element_text(face = "bold", size = 9, hjust = 1),
-           axis.text.y.right = element_text(face = "bold", size = 9),
-           # axis.ticks.y.right = element_line( margin = margin(l = -10)),
+           axis.text.y.right = element_text(face = "bold", size = 9, margin = margin(l = -20)),
+           axis.ticks.y.right = element_blank(),
            axis.title.y.right = element_text(face = "bold", margin = margin(l = 10)),
            axis.title.x = element_text(face = "bold"),
            axis.title.y = element_text(face = "bold"),
@@ -264,7 +271,7 @@ server <- function(input, output) {
     base.size = 8,
     font.radar = "Arial Black",
     values.radar = c("0%", "50%", "100%"),
-    axis.labels = c("ITh","pers","onto","CDM","BIMS","DM","ITi","store","ITc","DWH","regis","anno","clin","IC"),  
+    axis.labels = etichette,  
     plot.extent.x.sf = 1,
     plot.extent.y.sf = 1.2,
     label.centre.y = FALSE,
@@ -311,7 +318,7 @@ output$radar2 <- renderPlot({
     base.size = 8,
     font.radar = "Arial Black",
     values.radar = c("0%", "50%", "100%"),
-    axis.labels = c("ITh","pers","onto","CDM","BIMS","DM","ITi","store","ITc","DWH","regis","anno","clin","IC"),  
+    axis.labels = etichette,  
     plot.extent.x.sf = 1,
     plot.extent.y.sf = 1.2,
     label.centre.y = FALSE,
@@ -358,7 +365,7 @@ output$radar3 <- renderPlot({
     base.size = 8,
     font.radar = "Arial Black",
     values.radar = c("0%", "50%", "100%"),
-    axis.labels = c("ITh","pers","onto","CDM","BIMS","DM","ITi","store","ITc","DWH","regis","anno","clin","IC"),  
+    axis.labels = etichette,  
     plot.extent.x.sf = 1,
     plot.extent.y.sf = 1.2,
     label.centre.y = FALSE,
@@ -400,10 +407,8 @@ output$radar3 <- renderPlot({
     labs(y = paste("Biobanks median score:"))}, width = 300, height = 300)
   
 
-
 output$legend <- renderPlot({
 grid.arrange(tabella, nrow = 1)}, width = 300, height = 350)
-
 
 }
 

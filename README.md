@@ -29,7 +29,7 @@ Rscript -e "rmarkdown::render('quantitative_tiering.Rmd')"
 ```
 
 ### Visualization
-![Tier_Viz](https://github.com/bbdataeng/BB4FAIR/assets/51079644/d4a595f5-ffda-424c-8810-e89d03330cfc)
+![Tier_Viz](https://github.com/bbdataeng/BB4FAIR/blob/main/visualization/Tier_Viz.png)
 
 
 ### Shiny App

@@ -18,6 +18,27 @@ library(gridExtra)
 
 
 tier_BB <- data.frame(read_excel("./data/punteggi_tiering.xlsx",1))
+library(tidyverse)
+library(tidyr)
+library(dplyr)
+library(viridis)
+library(ggplot2)
+library(ggpubr)
+library(readxl)
+library(ggradar)
+library(tidyverse)
+library(scales)
+library(tibble)
+library(hrbrthemes)
+library(grid)
+library(gridExtra)
+
+
+
+
+
+tier_BB <- read_xlsx("punteggi_tiering.xlsx", sheet = "abb")
+
 
 tier_norm_BB <- round(tier_BB %>%
 			mutate(personale.dedicato = personale.dedicato/max(personale.dedicato),
@@ -29,6 +50,7 @@ tier_norm_BB <- round(tier_BB %>%
 				 annotazioni = annotazioni/max(annotazioni),
 				 consenso.informato = consenso.informato/max(consenso.informato)
 			),2)
+
 
 
 
@@ -57,31 +79,19 @@ tier_norm_BB$punt_norm<-apply(tier_norm_BB[,c(2:15)],1,sum)
 tier_norm_BB$tier <- ifelse(tier_norm_BB$punteggio_totale < 11, "Starting",
 					ifelse(tier_norm_BB$punteggio_totale < 21, "Advanced", "Mature"))
 
-tier_norm_BB$tier_norm <- ifelse(tier_norm_BB$punt_norm < 4.62, "Starting",
-                       		   ifelse(tier_norm_BB$punt_norm < 9.24, "Advanced", "Mature"))
-
-tier_norm_BB$tier_quart <- ifelse(tier_norm_BB$punt_norm < 3.5, "Low",
-                       		   ifelse(tier_norm_BB$punt_norm < 7, "Starting",
-							ifelse(tier_norm_BB$punt_norm < 10.5, "Advanced", "Mature")))
-
-head(tier_norm_BB)
 
 dati<-pivot_longer(tier_norm_BB, IT_head:informed_consent,names_to="facilities",values_to="score")
-dati<-data.frame(dati,macro_areas=c(rep(c(rep("personnel",4),rep("infrastructure",6),rep("data",4)),nrow(tier_norm_BB))))
+dati<-data.frame(dati,
+			 macro_areas=c(rep(c(rep("personnel",4),"infrastructure","data",rep("infrastructure",4),rep("data",4)),
+			 nrow(tier_norm_BB))))
 dati$tier <- ifelse(dati$punteggio_totale < 11, "Starting",
                        ifelse(dati$punteggio_totale < 21, "Advanced", "Mature"))
-dati
-
-
-
 
 
 
 ####################################################################################
-###################################### PLOTS  ######################################
+################################ PLOT DIVERSI ######################################
 ####################################################################################
-
-
 
 #######HEATMAP
 
@@ -103,7 +113,7 @@ nuovi_nomi_variabili <- c(
 
 
 dati$nuova_variabile <- factor(dati$facilities, levels = unique(dati$facilities), labels = nuovi_nomi_variabili)
-head(dati,40)
+
 
 p2<-ggplot(dati, aes(x = biobank, y = nuova_variabile, fill = score)) +
    geom_tile(color = "black", linewidth = 0.7) +
@@ -159,7 +169,6 @@ p1<-ggplot(dati)+
          	 axis.ticks.y.right = element_line(color = "grey30"),
 		 panel.spacing.x = unit(-3, "lines"))
 
-
 ggsave(filename = "density.png", 
 	 plot = p1 , 
 	 device = "png", 
@@ -172,15 +181,20 @@ ggsave(filename = "density.png",
 
 
 
-			
 
+
+
+		
 lista_tier <- tier_norm_BB %>% group_split(tier)
 
 col_median1 <- apply(lista_tier[[1]][,c(2:15)], 2, median)
 col_median2 <- apply(lista_tier[[2]][,c(2:15)], 2, median)
 col_median3 <- apply(lista_tier[[3]][,c(2:15)], 2, median)
-col_summary <- data.frame(tier=c("Starting","Advanced","Mature"),t(data.frame(Base = col_median1, Medium = col_median3, High = col_median2)))
+col_summary <- data.frame(tier=c("Starting","Advanced","Mature"),t(data.frame(Base = col_median3, Intermediate = col_median1, High = col_median2)))
+col_summary <- cbind(col_summary[,-c(7,13:15)],col_summary[,c(7,13:15)])
 
+
+etichetta<-c("ITh","pers","onto","CDM","BIMS","ITi","store","ITc","DWH","regis","DM","anno","clin","IC")
 
 
 ##RADARPLOT
@@ -191,7 +205,7 @@ for(i in 1:nrow(col_summary)) {
     base.size = 8,
     font.radar = "Arial Black",
     values.radar = c("0%", "50%", "100%"),
-    axis.labels = c("ITh","pers","onto","CDM","BIMS","DM","ITi","store","ITc","DWH","regis","anno","clin","IC"),  
+    axis.labels = etichetta,  
     plot.extent.x.sf = 1,
     plot.extent.y.sf = 1.2,
     label.centre.y = FALSE,
@@ -249,7 +263,7 @@ ggsave(filename = paste("radar_tier",i,".png"),
 
 ##LEGENDA RADAR
 
-etichette<-c("ITh","pers","onto","CDM","BIMS","DM","ITi","store","ITc","DWH","regis","anno","clin","IC")
+etichette<-c("ITh","pers","onto","CDM","BIMS","ITi","store","ITc","DWH","regis","DM","anno","clin","IC")
 
 etichette <- paste0("    ", etichette)
 
@@ -264,11 +278,17 @@ mytheme <- ttheme_default(
   )
 )
 
-tabella <- tableGrob(data.frame(etichette = as.character(etichette), nuova_variabile = as.character(unique(dati$nuova_variabile))), 
-                     theme = mytheme, cols = c("", "record"))
+tabella <- tableGrob(data.frame(etichette = as.character(etichette), 
+					    nuova_variabile = c(as.character(unique(dati$nuova_variabile)[1:5]),
+									as.character(unique(dati$nuova_variabile)[7:11]),
+									as.character(unique(dati$nuova_variabile)[c(6,12:14)]))),					
+                       theme = mytheme, cols = c("", "record"))
 tabella$widths <- unit(tabella$widths + unit(0.5, "cm"), "cm")
+
 
 p5<-grid.arrange(tabella, nrow = 1)
 
 ggsave("arranged_plot.png", p5, dpi=300, device = "png",height = 5,width = 4)
+
+
 
