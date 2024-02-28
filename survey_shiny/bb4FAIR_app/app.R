@@ -65,7 +65,40 @@ ui <-
 )),
 
 tabPanel('Questions', DT::dataTableOutput('questions')),
-tabPanel('Answers'),
+tabPanel('Answers', sidebarLayout(
+  sidebarPanel(
+    selectInput(
+      inputId = "y",
+      label = "State",
+      choices = c(0,1),
+      selected = "Alabama",
+      multiple = TRUE
+    ),
+    Multiple = TRUE,
+    selectInput(
+      inputId = "x",
+      label = "X-axis:",
+      choices = c("Year"),
+      selected = "Year"
+    ),
+    selectInput(
+      inputId = "col_p",
+      label = "Select a Point Color",
+      choices = c("red", "dark green", "blue", "black"),
+      selected = "black"
+    ),
+    selectInput(
+      inputId = "col_l",
+      label = "Select a Line Color:",
+      choices = c("Red", "Blue", "Black", "Dark Green"),
+      selected = "blue"
+    ),
+    actionButton("run_plot", "Render Plot")
+  ), mainPanel(
+    plotOutput(outputId = "graph")
+  )
+
+)),
 tabPanel('Visualization',  
        fluidPage(
         fluidRow(
@@ -397,7 +430,7 @@ grid.arrange(tabella, nrow = 1)}, width = 300, height = 350)
 # Grafici Federica --------------------------------------------------------
 
 
-# output$
+output$graph <- renderPlot({plot(c(0,1,2,3))})
 }
 
 
