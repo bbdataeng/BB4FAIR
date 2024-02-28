@@ -22,30 +22,29 @@ library(DT)
 
 
 # Load Data ---------------------------------------------------------------
-# tier_BB <- read_xlsx("data/punteggi_tiering.xlsx", sheet = "abb")    	
-scores <- read_xlsx("./punteggi_tiering.xlsx", sheet = "punteggi_totali")
+# tier_BB <- read_xlsx("/punteggi_tiering.xlsx", sheet = "abb")  
+scores <- read_xlsx("./tiering2.xlsx", sheet = "total_score")
+# scores <- read_xlsx("./punteggi_tiering.xlsx", sheet = "punteggi_totali")
 colnames(scores)[1] <- "BB_ID"
 info_area <- read_xlsx("./quantitativa.xlsx", sheet = "razionale")
 # questions <- read_xlsx("./quantitativa.xlsx", sheet = 4)
 
 
 ## add tiers
-scores$tier <- ifelse(scores$punteggio_totale > 20, "Mature", 
-                    ifelse(scores$punteggio_totale < 11, "Starting", "Advanced"))
+scores$tier <- ifelse(scores$total_score > 20, "Mature", 
+                    ifelse(scores$total_score < 11, "Starting", "Advanced"))
 macroareas <- info_area[1:14,c("domanda","area")]
 
-
+scores$BB_ID <- paste0("BB", seq(1:dim(scores)[1]))
+scores <- scores%>%arrange(desc(total_score))
 
 # User Interface ----------------------------------------------------------
 ui <- 
-  ## navigation bar
-  navbarPage(
-    title = 'Digital Maturity Survey',
-    tabPanel('Scores',     
- 
   fluidPage(
-  ## new row in the UI for selectInputs
-  fluidRow(
+    titlePanel(tags$b('Digital Maturity Survey')),
+               tabsetPanel(
+                 tabPanel('Scores',     
+ fluidRow(
 	     column(4,selectInput("bb_name",
                        "Biobank ID:",
                        c("All",
@@ -58,7 +57,7 @@ ui <-
                                    "Macro-areas:", 
                                    choices = c("All", unique(as.character(macroareas$area))),
                                 multiple = TRUE)
-		)
+		
   ),
   
   DT::dataTableOutput("scores")
@@ -66,18 +65,19 @@ ui <-
 )),
 
 tabPanel('Questions', DT::dataTableOutput('questions')),
+tabPanel('Answers'),
 tabPanel('Visualization',  
        fluidPage(
         fluidRow(
-           column(3,plotOutput("density")),
-           column(3,plotOutput("heatmap"))),
+           column(4,plotOutput("density", height = "60vh", width="100%")),
+           column(2,plotOutput("heatmap", height = "60vh", width="100%"))),
         fluidRow(
-	     column(3,plotOutput("radar1")),
-           column(3,plotOutput("radar2")),
-           column(3,plotOutput("radar3")),
-           column(3,plotOutput("legend"))
+	     column(3,plotOutput("radar1", height = "60vh", width="100%")),
+           column(3,plotOutput("radar2", height = "60vh", width="100%")),
+           column(3,plotOutput("radar3", height = "60vh", width="100%")),
+           column(3,plotOutput("legend", height = "60vh", width="100%"))
 		    ))
-))
+)))
 
 
 
@@ -88,8 +88,6 @@ server <- function(input, output) {
   # filter data based on selections
   output$scores <- DT::renderDataTable(DT::datatable({
     data <- scores
-    names(data)[names(data) == 'punteggio_totale'] <- 'total_score'
-    data$BB_ID <- paste0("BB", data$BB_ID)
     
     if (input$bb_name != "All") {
       data <- data[data$BB_ID == input$bb_name,]
@@ -120,86 +118,70 @@ server <- function(input, output) {
 
   #preprocessing data long form for plots
 
-  tier_norm_BB <- round(data.frame(scores[,1:16]) %>%
-			mutate(personale.dedicato = personale.dedicato/max(personale.dedicato),
-				 ontologie = ontologie/max(ontologie),
-				 LIMS = LIMS/max(LIMS),
-				 Infrastruttura.IT = Infrastruttura.IT/max(Infrastruttura.IT),
-				 Componenti.IT = Componenti.IT/max(Componenti.IT), 
-				 DWH = DWH/max(DWH),
-				 annotazioni = annotazioni/max(annotazioni),
-				 consenso.informato = consenso.informato/max(consenso.informato)
-			),2)
-
-
-
-  dimnames(tier_norm_BB)[[2]]<-c(
-  "biobank",
-  "IT_head",
-  "dedicated_personnel",
-  "ontologies_richness",
-  "common_data_models",
-  "BIMS",
-  "data_management",
-  "IT_infrastructures",
-  "massive_storage",
-  "IT_components",
-  "data_warehouse",
-  "registry_data_availability",
-  "annotations",
-  "clinical_data_availability",
-  "informed_consent",
-  "punteggio_totale"
-  )
+  tier_norm_BB <- round(scores[,2:16] %>%
+                          mutate(dedicated_personnel = dedicated_personnel/max(dedicated_personnel),
+                                 ontologies_richness = ontologies_richness/max(ontologies_richness),
+                                 BIMS = BIMS/max(BIMS),
+                                 IT_infrastructures = IT_infrastructures/max(IT_infrastructures),
+                                 IT_components = IT_components/max(IT_components), 
+                                 data_warehouse = data_warehouse/max(data_warehouse),
+                                 annotations = annotations/max(annotations),
+                                 informed_consent = informed_consent/max(informed_consent)
+                          ),2)
+  tier_norm_BB$biobank <- seq(1,47)
   
-
-
-  tier_norm_BB$punt_norm<-apply(tier_norm_BB[,c(2:15)],1,sum)
-
-  tier_norm_BB$tier <- ifelse(tier_norm_BB$punteggio_totale < 11, "Starting",
-					ifelse(tier_norm_BB$punteggio_totale < 21, "Advanced", "Mature"))
+  tier_norm_BB$tier <- ifelse(tier_norm_BB$total_score < 11, "Starting",
+                              ifelse(tier_norm_BB$total_score < 21, "Advanced", "Mature"))
+  
+  
   dati<-pivot_longer(tier_norm_BB, IT_head:informed_consent,names_to="facilities",values_to="score")
   dati<-data.frame(dati,
-			 macro_areas=c(rep(c(rep("personnel",4),"infrastructure","data",rep("infrastructure",4),rep("data",4)),
-			 nrow(tier_norm_BB))))
-  dati$tier <- ifelse(dati$punteggio_totale < 11, "Starting",
-                       ifelse(dati$punteggio_totale < 21, "Advanced", "Mature"))
+                   macro_areas=c(rep(c(rep("personnel",4),rep("infrastructure",5),rep("data",5)),
+                                     nrow(tier_norm_BB))))
   
   
 
-  # preprocessing heatmap plot
-
-  nuovi_nomi_variabili <- c(
-  "IT head",
-  "dedicated personnel",
-  "ontologies richness",
-  "common data models",
-  "BIMS",
-  "data management",
-  "IT infrastructures",
-  "massive storage",
-  "IT components",
-  "data warehouse",
-  "registry data availability",
-  "annotations",
-  "clinical data availability",
-  "informed consent")
-   
-  dati$nuova_variabile <- factor(dati$facilities, levels = unique(dati$facilities), labels = nuovi_nomi_variabili)
+  
+  
+  
+  # Heatmap -----------------------------------------------------------
+  
+  # Preprocessing data
+  
+  new_names <- c(
+    "IT head",
+    "dedicated personnel",
+    "ontologies richness",
+    "common data models",
+    "BIMS",
+    "data management",
+    "IT infrastructures",
+    "massive storage",
+    "IT components",
+    "data warehouse",
+    "clinical data availability",
+    "annotations",
+    "registry data availability",
+    "informed consent")
+  
+  dati$nuova_variabile <- factor(dati$facilities, levels = unique(dati$facilities), labels = new_names)
   
   # preprocessing radar plot
   lista_tier <- tier_norm_BB %>% group_split(tier)
   
-  col_median1 <- apply(lista_tier[[1]][,c(2:15)], 2, median)
-  col_median2 <- apply(lista_tier[[2]][,c(2:15)], 2, median)
-  col_median3 <- apply(lista_tier[[3]][,c(2:15)], 2, median)
+  col_median1 <- apply(lista_tier[[1]][,c(1:14)], 2, median)
+  col_median2 <- apply(lista_tier[[2]][,c(1:14)], 2, median)
+  col_median3 <- apply(lista_tier[[3]][,c(1:14)], 2, median)
   col_summary <- data.frame(tier=c("Starting","Advanced","Mature"),t(data.frame(Base = col_median3, Intermediate = col_median1, High = col_median2)))
-  col_summary <- cbind(col_summary[,-c(7,13:15)],col_summary[,c(7,13:15)])
+  # col_summary <- cbind(col_summary[,-c(7,13:15)],col_summary[,c(7,13:15)])
   
   # preprocessing legend
 
-  etichette<-c("ITh","pers","onto","CDM","BIMS","ITi","store","ITc","DWH","regis","DM","anno","clin","IC")
-
+  # etichette <-c("ITh","pers","onto","CDM","BIMS","ITi","store","ITc","DWH",
+  #               "clin","DM","anno","regis","IC")
+  etichette <-c("ITh","pers","onto","CDM","BIMS","DM","ITi","store","ITc","DWH",
+                "clin","anno","regis","IC")
+  
   etichette <- paste0("    ", etichette)
 
   mytheme <- ttheme_default(
@@ -410,6 +392,12 @@ output$radar3 <- renderPlot({
 output$legend <- renderPlot({
 grid.arrange(tabella, nrow = 1)}, width = 300, height = 350)
 
+
+
+# Grafici Federica --------------------------------------------------------
+
+
+# output$
 }
 
 
