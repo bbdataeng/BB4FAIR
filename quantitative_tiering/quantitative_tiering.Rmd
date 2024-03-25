@@ -22,11 +22,10 @@ library(stringr)
 library("writexl")
 
 #setwd("/Users/matteo/OneDrive - CNR/bbmri-it-pnrr/survey-wp4-tiering/tiering")
-setwd("C:/Users/Antonella/Desktop/bb4FAIR")
 quant <- read_excel("./data/quantitativa.xlsx", sheet = "razionale")
 quant <- quant[1:14,1:6]
 quant <- quant[order(quant$id), ]
-survey <- read_excel("./data/231206-risposte.xlsx")
+survey <- read_excel("./data/survey_risposte_240123_anon.xlsx")
 bb <- survey$ID
 survey <- as.data.frame(survey[,c(7:44)]) 
 bb <- paste0("BB", bb)
@@ -352,18 +351,18 @@ punteggi$`Nome biobanca` <- row
 punteggi <- punteggi %>%
   relocate(`Nome biobanca`)
 
-# wb <- createWorkbook()
-# addWorksheet(wb, sheetName = "punteggi_totali")
-# addWorksheet(wb, sheetName = "tier_1")
-# addWorksheet(wb, sheetName = "tier_2")
-# addWorksheet(wb, sheetName = "tier_3")
-# 
-# writeData(wb, sheet = "punteggi_totali", punteggi)
-# writeData(wb, sheet = "tier_1", tier_1, colNames = F)
-# writeData(wb, sheet = "tier_2", tier_2, colNames = F)
-# writeData(wb, sheet = "tier_3", tier_3, colNames = F)
-# 
-# saveWorkbook(wb, "punteggi_tiering.xlsx")
+wb <- createWorkbook()
+addWorksheet(wb, sheetName = "punteggi_totali")
+addWorksheet(wb, sheetName = "tier_1")
+addWorksheet(wb, sheetName = "tier_2")
+addWorksheet(wb, sheetName = "tier_3")
+
+writeData(wb, sheet = "punteggi_totali", punteggi)
+writeData(wb, sheet = "tier_1", tier_1, colNames = F)
+writeData(wb, sheet = "tier_2", tier_2, colNames = F)
+writeData(wb, sheet = "tier_3", tier_3, colNames = F)
+
+saveWorkbook(wb, "punteggi_tiering.xlsx")
 
 ```
 

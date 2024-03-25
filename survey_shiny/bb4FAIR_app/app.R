@@ -16,39 +16,68 @@ library(hrbrthemes)
 library(grid)
 library(gridExtra)
 library(DT)
-
+library(RColorBrewer)
+# library(shinydashboard)
 
 
 
 
 # Load Data ---------------------------------------------------------------
 # tier_BB <- read_xlsx("/punteggi_tiering.xlsx", sheet = "abb")  
+
 scores <- read_xlsx("./tiering2.xlsx", sheet = "total_score")
 # scores <- read_xlsx("./punteggi_tiering.xlsx", sheet = "punteggi_totali")
 colnames(scores)[1] <- "BB_ID"
-info_area <- read_xlsx("./quantitativa.xlsx", sheet = "razionale")
+
+info_area <- read_xlsx("./quantitative.xlsx", sheet = "razionale")
 # questions <- read_xlsx("./quantitativa.xlsx", sheet = 4)
 
 
 ## add tiers
 scores$tier <- ifelse(scores$total_score > 20, "Mature", 
                     ifelse(scores$total_score < 11, "Starting", "Advanced"))
-macroareas <- info_area[1:14,c("domanda","area")]
+macroareas <- info_area[1:14,c("question","area")]
+macroareas$question <- str_replace(str_replace(macroareas$question, " ", "_"), "-", "_")
 
 scores$BB_ID <- paste0("BB", seq(1:dim(scores)[1]))
-scores <- scores%>%arrange(desc(total_score))
 
+## question labels
+source("plot.R") # import plots 
+plots <- list(
+  "Personnel dedicated to the Biobank" = function() chart_personnel1,
+  "Biobank personnel activities" = function() personnel2,
+  "Presence of data annotation experience" = function() personnel3,
+  "Terminologies" = function() terminologies,
+  "Personnel with experience in CDM" = function() personnel5,
+  "Common Data Models" = function() cdm,
+  "Personnel with experience in FHIR model" = function() fhir,
+  "BIMS" = function() bims3,
+  "Clinical data linkage" = function() clindata,
+  "Informatic infrastructure for biobank" = function() infradata,
+  "Massive storage system" = function() storage,
+  "Federated Research" = function() fedres,
+  "Data Warehouse" = function() dwh,
+  "'omics' platform" = function() omics,
+  "Data specialization" = function() data,
+  "Data type stored" = function() data2,
+  "Ontologies" = function() onto,
+  "Data crossing" = function() data3,
+  "System for cross-reference data" = function() data4,
+  "Informed consent" = function() ic
+)
+questions_labels <- names(plots)
 # User Interface ----------------------------------------------------------
 ui <- 
+  
   fluidPage(
-    titlePanel(tags$b('Digital Maturity Survey')),
-               tabsetPanel(
+    titlePanel(HTML('<b>Digital Maturity Survey</b>')),
+    tabsetPanel(
                  tabPanel('Scores',     
  fluidRow(
 	     column(4,selectInput("bb_name",
                        "Biobank ID:",
                        c("All",
-                         unique(as.character(paste0("BB",scores$BB_ID)))))),
+                         unique(as.character(scores$BB_ID))))),
            column(4,selectInput("tier",
                        "Tier:",
                        c("All",
@@ -64,41 +93,25 @@ ui <-
 
 )),
 
-tabPanel('Questions', DT::dataTableOutput('questions')),
-tabPanel('Answers', sidebarLayout(
-  sidebarPanel(
-    selectInput(
-      inputId = "y",
-      label = "State",
-      choices = c(0,1),
-      selected = "Alabama",
-      multiple = TRUE
-    ),
-    Multiple = TRUE,
-    selectInput(
-      inputId = "x",
-      label = "X-axis:",
-      choices = c("Year"),
-      selected = "Year"
-    ),
-    selectInput(
-      inputId = "col_p",
-      label = "Select a Point Color",
-      choices = c("red", "dark green", "blue", "black"),
-      selected = "black"
-    ),
-    selectInput(
-      inputId = "col_l",
-      label = "Select a Line Color:",
-      choices = c("Red", "Blue", "Black", "Dark Green"),
-      selected = "blue"
-    ),
-    actionButton("run_plot", "Render Plot")
-  ), mainPanel(
-    plotOutput(outputId = "graph")
-  )
-
-)),
+# tabPanel('Questions', DT::dataTableOutput('questions')),
+tabPanel('Answers', 
+         titlePanel("Biobank Digital Maturity Answers"),
+         sidebarLayout(
+           sidebarPanel(
+             HTML("<p>Explore the answers to different questions by selecting from the list below.</p>"),
+             selectizeInput(
+               inputId = "question",
+               label = "Question:",
+               choices = questions_labels,
+               multiple = FALSE
+             )
+           ),
+           mainPanel( 
+             tags$style("#graph {margin-top: 50px;}"),
+             plotOutput("graph", height = "60vh", width="100%")
+           )
+         )
+),
 tabPanel('Visualization',  
        fluidPage(
         fluidRow(
@@ -121,7 +134,7 @@ server <- function(input, output) {
   # filter data based on selections
   output$scores <- DT::renderDataTable(DT::datatable({
     data <- scores
-    
+    colnames(data)[2:15] <- macroareas$question
     if (input$bb_name != "All") {
       data <- data[data$BB_ID == input$bb_name,]
     }
@@ -137,7 +150,7 @@ server <- function(input, output) {
         colname <- paste0(selected_macroarea, "_score")
         macro_scores <- c(macro_scores, colname)
         # sum for the selected macroarea
-        selected_cols <- macroareas$domanda[macroareas$area %in% selected_macroarea]
+        selected_cols <- macroareas$question[macroareas$area %in% selected_macroarea]
         final_cols <- c(final_cols, selected_cols)
         data[[colname]] <- rowSums(data[, selected_cols])}
       
@@ -150,8 +163,9 @@ server <- function(input, output) {
   
 
   #preprocessing data long form for plots
-
-  tier_norm_BB <- round(scores[,2:16] %>%
+  scores_forplot <- scores%>%arrange(desc(total_score))
+  # scores <- scores%>%arrange(desc(total_score))
+  tier_norm_BB <- round(scores_forplot[,2:16] %>%
                           mutate(dedicated_personnel = dedicated_personnel/max(dedicated_personnel),
                                  ontologies_richness = ontologies_richness/max(ontologies_richness),
                                  BIMS = BIMS/max(BIMS),
@@ -228,10 +242,8 @@ server <- function(input, output) {
     )
   )
 
-  tabella <- tableGrob(data.frame(etichette = as.character(etichette), 
-					    nuova_variabile = c(as.character(unique(dati$nuova_variabile)[1:5]),
-									as.character(unique(dati$nuova_variabile)[7:11]),
-									as.character(unique(dati$nuova_variabile)[c(6,12:14)]))),					
+  tabella <- tableGrob(data.frame(etichette = as.character(etichette),
+                                  nuova_variabile = c(as.character(unique(dati$nuova_variabile)))),					
                        theme = mytheme, cols = c("", "record"))
   tabella$widths <- unit(tabella$widths + unit(0.5, "cm"), "cm")
 
@@ -422,15 +434,29 @@ output$radar3 <- renderPlot({
     labs(y = paste("Biobanks median score:"))}, width = 300, height = 300)
   
 
+
+
 output$legend <- renderPlot({
 grid.arrange(tabella, nrow = 1)}, width = 300, height = 350)
 
 
+###############
 
-# Grafici Federica --------------------------------------------------------
+# source("plot.R") # import plots 
 
 
-output$graph <- renderPlot({plot(c(0,1,2,3))})
+
+output$graph <- renderPlot({
+  question <- input$question
+  if (question %in% names(plots)) {
+    plots[[question]]()
+  } else {
+    NULL
+  }
+})
+
+
+
 }
 
 

@@ -5,6 +5,6 @@ account: bbdataeng
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 11087908
-bundleId: 8207166
+bundleId: 8385892
 url: https://bbdataeng.shinyapps.io/bb4fair_app/
 version: 1
