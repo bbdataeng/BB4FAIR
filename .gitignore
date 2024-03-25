@@ -6,3 +6,5 @@ material/riepilogo-microsoft-form.pdf
 survey_shiny/bb4FAIR_app/quantitative.xlsx
 survey_shiny/bb4FAIR_app/tiering.xlsx
 survey_shiny/bb4FAIR_app/survey_risposte_240123.xlsx
+*.Rhistory
+rsconnect*
