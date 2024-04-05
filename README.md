@@ -34,3 +34,13 @@ Rscript -e "rmarkdown::render('quantitative_tiering.Rmd')"
 
 ### Shiny App
 https://bbdataeng.shinyapps.io/bb4FAIR_app/
+
+or using BB4FAIR docker image:
+```shell
+$ docker build -t bb4fair .
+```
+
+```shell
+$ docker run -it --rm -p 3838:3838 bb4fair
+```
+use BB4FAIR shiny in a browser by typing http://localhost:3838
