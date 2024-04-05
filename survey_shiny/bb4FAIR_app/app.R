@@ -25,7 +25,7 @@ library(RColorBrewer)
 # Load Data ---------------------------------------------------------------
 # tier_BB <- read_xlsx("/punteggi_tiering.xlsx", sheet = "abb")  
 
-scores <- read_xlsx("./tiering2.xlsx", sheet = "total_score")
+scores <- read_xlsx("./tiering.xlsx", sheet = "total_score")
 # scores <- read_xlsx("./punteggi_tiering.xlsx", sheet = "punteggi_totali")
 colnames(scores)[1] <- "BB_ID"
 
