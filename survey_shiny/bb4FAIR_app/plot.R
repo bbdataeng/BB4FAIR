@@ -446,6 +446,7 @@ sist$`sist$.` <- factor(sist$`sist$.`, levels = sist$`sist$.`)
 
 lims <- as.data.frame(table(lims), stringsAsFactors = F)
 lims <- lims[order(lims$Freq, decreasing = T),]
+lims$lims <- paste("BIMS_", seq(1, length(lims$lims)), sep = "")
 lims$lims <- factor(lims$lims, levels = lims$lims)
 
 # barplot 
@@ -895,7 +896,7 @@ omiche <- table(omiche) %>%
   as.data.frame() %>%
   move2last(1)
 
-omiche$. <- str_replace(omiche$., "Proteomica", "Proteomicsc")
+omiche$. <- str_replace(omiche$., "Proteomica", "Proteomics")
 omiche$. <- str_replace(omiche$., "Metabolomica", "Metabolomics")
 omiche$. <- str_replace(omiche$., "Genomica", "Genomics")
 omiche <- omiche[order(omiche$Freq, decreasing = T),]
@@ -1015,7 +1016,7 @@ for (a in 1:length(dati$.)) {
   
 }
 
-dati$. <- str_replace(dati$., "malattie rare", "Rare disease")
+dati$. <- str_replace(dati$., "malattie rare", "Rare diseases")
 dati$. <- str_replace(dati$., "oncologia", "Oncology")
 dati$. <- str_replace(dati$., "metagenomica batterica", "Bacterial metagenomics")
 dati$. <- str_replace(dati$., "metagenomica virale", "Viral metagenomics")
@@ -1037,7 +1038,7 @@ dati$labelPosition <- (dati$ymax + dati$ymin) / 2
 chart_data <- ggplot(dati, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=.)) +
   geom_rect() +
   xlim(c(2, 4)) +
-  geom_text(x= 4.2, aes(y=labelPosition, label = paste0("N = ", Freq, ",\n", round(fraction*100, digit = 1), "%")), size = 3, fontface = "bold") +
+  geom_text(x= 4.3, aes(y=labelPosition, label = paste0("N = ", Freq, ",\n", round(fraction*100, digit = 1), "%")), size = 2.8, fontface = "bold") +
   coord_polar("y", start=0)+
   theme_void() +
   labs(title = "Biobanked data specialization", x = "", y = "", ) +
