@@ -32,7 +32,7 @@ move2last <- function(df, r) {
 
 # color palette 
 nb.cols <- 18
-mycolors <- c("#8dd3c7","#fdb462","#bebada","#fb8072","#80b1d3","#dfc27d","#b3de69","#fccde5","#ccebc5","#a18080","#bc80bd","#cdea51","#da5f0f","#1499bf","#906a85","#2aad8a","#f4a582","#f9f68a")
+mycolors <- c("#8dd3c7", "#fdb462", "#bebada", "#fb8072", "#80b1d3", "#dfc27d", "#b3de69", "#fccde5", "#ccebc5", "#a18080", "#bc80bd", "#cdea51", "#da5f0f", "#1499bf", "#906a85", "#2aad8a", "#f4a582", "#f9f68a")
 
 
 
