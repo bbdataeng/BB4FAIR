@@ -18,7 +18,7 @@ library(DT)
 
 #survey_BB
 # setwd("C:/Users/Antonella/Desktop/BBMRI_repos/bb4FAIR/survey_shiny/bb4FAIR_app")
-survey <- read_xlsx("./survey_risposte_240123.xlsx")
+survey <- read_xlsx("../../data/Survey sulla Maturità Digitale delle Biobanche Italiane(1-47).xlsx")
 survey <- as.data.frame(survey[,c(7:44)])
 
 
@@ -66,7 +66,7 @@ chart_personnel <- ggplot(p_dedicato, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, 
     plot.title = element_text(face = "bold", size = 16, hjust = 0.5) )+
   scale_fill_manual(values = mycolors)
 
-print(chart_personnel)
+
 # personnel activities ---------------------------
 
 attiv <- survey[[6]] %>%
@@ -287,7 +287,7 @@ for (cdmodel in 1:length(cdm$.)) {
   if(cdm$.[cdmodel] %in% c("OMOP", "FHIR"))  {
     cdmodel <- cdmodel 
   } else {
-    altri_CDM <- c(altri_CDM, cdm$.[cdmodel])
+    other_CDM <- c(other_CDM, cdm$.[cdmodel])
     cdm$.[cdmodel] <- "Some other"
   }
 }  
@@ -466,7 +466,6 @@ chart_lims2 <- ggplot(lims, aes(x = lims, y = Freq, fill = lims)) +
   guides(fill = guide_legend(title = "")) +
   scale_fill_manual(values = mycolors) + 
   scale_y_continuous(expand = expansion( mult = c(0, 0.1)))
-
 
 # clinical data ----------------------------------------
 
