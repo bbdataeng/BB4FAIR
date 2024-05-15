@@ -83,7 +83,7 @@ questions_labels <- names(plots)
 ui <- 
   
   fluidPage(
-    titlePanel(HTML('<b>Digital Maturity Survey</b>')),
+    titlePanel(HTML('Digital Maturity Survey')),
     tabsetPanel(
                  tabPanel('Scores',     
  fluidRow(
