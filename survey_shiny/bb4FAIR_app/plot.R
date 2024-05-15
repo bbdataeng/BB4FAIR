@@ -18,7 +18,7 @@ library(DT)
 
 #survey_BB
 # setwd("C:/Users/Antonella/Desktop/BBMRI_repos/bb4FAIR/survey_shiny/bb4FAIR_app")
-survey <- read_xlsx("../../data/Survey sulla Maturità Digitale delle Biobanche Italiane(1-47).xlsx")
+survey <- read_xlsx("../../data/survey_risposte_completo.xlsx")
 survey <- as.data.frame(survey[,c(7:44)])
 
 

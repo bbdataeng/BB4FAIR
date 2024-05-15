@@ -21,7 +21,6 @@ library(RColorBrewer)
 
 
 
-
 # Load Data ---------------------------------------------------------------
 # tier_BB <- read_xlsx("/punteggi_tiering.xlsx", sheet = "abb")  
 
