@@ -24,11 +24,11 @@ library(RColorBrewer)
 # Load Data ---------------------------------------------------------------
 # tier_BB <- read_xlsx("/punteggi_tiering.xlsx", sheet = "abb")  
 
-scores <- read_xlsx("../../data/tiering.xlsx", sheet = "total_score")
+scores <- read_xlsx("./tiering.xlsx", sheet = "total_score")
 # scores <- read_xlsx("./punteggi_tiering.xlsx", sheet = "punteggi_totali")
 colnames(scores)[1] <- "BB_ID"
 
-info_area <- read_xlsx("../../data/quantitative.xlsx", sheet = "razionale")
+info_area <- read_xlsx("./quantitative.xlsx", sheet = "razionale")
 # questions <- read_xlsx("./quantitativa.xlsx", sheet = 4)
 
 
@@ -41,7 +41,7 @@ macroareas$question <- str_replace(str_replace(macroareas$question, " ", "_"), "
 scores$BB_ID <- paste0("BB", seq(1:dim(scores)[1]))
 
 ## question labels
-source("plot.R") # import plots 
+source("./plot.R") # import plots 
 
 plots <- list(
   "Personnel dedicated to the Biobank" = function() chart_personnel,
