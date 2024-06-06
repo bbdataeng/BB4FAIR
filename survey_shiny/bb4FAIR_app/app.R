@@ -82,7 +82,7 @@ questions_labels <- names(plots)
 ui <- 
   
   fluidPage(
-    titlePanel(HTML('Digital Maturity Survey')),
+    titlePanel(HTML('Digital Maturity Survey for Biobanking')),
     tabsetPanel(
                  tabPanel('Scores',     
  fluidRow(
@@ -135,6 +135,8 @@ tabPanel('Visualization',
            column(3,plotOutput("radar3", height = "60vh", width="100%")),
            column(3,plotOutput("legend", height = "60vh", width="100%"))
 		    ))
+),
+tabPanel('Visualization2'
 )))
 
 
