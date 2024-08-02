@@ -1,6 +1,0 @@
-maturity model
-biobank
-quality assessment
-biobank facilities
-biobank core facilities
-clinical data warehouses

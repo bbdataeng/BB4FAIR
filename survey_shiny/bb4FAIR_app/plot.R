@@ -388,50 +388,22 @@ sist <- survey[[14]] %>%
   unlist() %>%
   as.data.frame()
 
-sist$. <- ifelse(grepl("easy", sist$., ignore.case = TRUE), "EASYTRACK", sist$.)
-sist$. <- ifelse(grepl("bio manag", sist$., ignore.case = TRUE), "Bio Management",sist$.)
-sist$. <- ifelse(grepl("red", sist$., ignore.case = TRUE), "REDcap",sist$.)
-sist$. <- ifelse(grepl("td", sist$., ignore.case = TRUE), "TDBioBank",sist$.)
-sist$. <- ifelse(grepl("home|house", sist$., ignore.case = TRUE), "auto sviluppato",sist$.)
-sist$. <- ifelse(grepl("wins", sist$., ignore.case = TRUE), "WINSAP",sist$.)
-sist$. <- ifelse(grepl("crios", sist$., ignore.case = TRUE), "CryoSMART",sist$.)
-
-sist$. <- ifelse(grepl("FREEZERWORKS", sist$., ignore.case = TRUE), "FREEZERWORKS",sist$.)
-sist$. <- ifelse(grepl("labvantage", sist$., ignore.case = TRUE), "LabVantage",sist$.)
-sist$. <- ifelse(grepl("tngb", sist$., ignore.case = TRUE), "TNGB",sist$.)
-sist$. <- ifelse(grepl("olohealth", sist$., ignore.case = TRUE), "Olohealth",sist$.)
-sist$. <- ifelse(grepl("NAUTILUS", sist$., ignore.case = TRUE), "NAUTILUS",sist$.)
-sist$. <- ifelse(grepl("smartlab", sist$., ignore.case = TRUE), "SmartLab",sist$.)
-sist$. <- ifelse(grepl("MBioLIMS", sist$., ignore.case = TRUE), "MBioLIMS",sist$.)
-sist$. <- ifelse(grepl("SmartyBioB", sist$., ignore.case = TRUE), "SmartyBioB",sist$.)
-
-sist$. <- str_remove_all(sist$., "\\(.*$")
-sist$. <- str_remove_all(sist$., "\\,.*$")
-sist$. <- str_remove_all(sist$., " $")
-sist$. <- str_remove_all(sist$., "^ ")
-
-sist_lims <- c("EASYTRACK", "TDBioBank", "LabVantage","REDcap", "Bio Management","NAUTILUS", "MBioLIMS","FREEZERWORKS","TNGB","Olohealth","SmartLab","SmartyBioB","Noraybank")
 
 lims <- c()
 NOlims <- c()
 
 for(n in sist$.) {
-  
-  if (n %in% sist_lims) {
-    lims <- append(lims, n)
-  } else { 
+
+  if (n == "NOBIMS") {
     NOlims <- append(NOlims, n)
+  } else {
+    lims <- append(lims, n)
   }
-  
+
 }
 
 sist <- as.data.frame(table(sist), stringsAsFactors = F)
 
-for (a in 1:length(sist$.)) {
-  
-  ifelse((sist$Freq[a] <= 1) && !(sist$.[a] %in% sist_lims), sist$.[a] <-"altro", sist$.)
-  
-}
 
 sist <- sist %>%
   group_by(sist$.) %>%
@@ -446,7 +418,7 @@ sist$`sist$.` <- factor(sist$`sist$.`, levels = sist$`sist$.`)
 
 lims <- as.data.frame(table(lims), stringsAsFactors = F)
 lims <- lims[order(lims$Freq, decreasing = T),]
-lims$lims <- paste("BIMS_", seq(1, length(lims$lims)), sep = "")
+# lims$lims <- paste("BIMS_", seq(1, length(lims$lims)), sep = "")
 lims$lims <- factor(lims$lims, levels = lims$lims)
 
 # barplot 

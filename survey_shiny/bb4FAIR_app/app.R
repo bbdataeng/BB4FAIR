@@ -139,7 +139,7 @@ ui <-
                               column(4, selectInput("tier", "Tier:", c("All", unique(as.character(scores$tier))))),
                               column(4, selectizeInput("macroarea", "Macro-areas:", choices = c("All", unique(as.character(macroareas$area))), multiple = TRUE))
                             ),
-                            mainPanel(DT::DTOutput("scores"))
+                            DT::dataTableOutput("scores")
                     ),
                     tabItem('Answers', 
                             titlePanel(""),
@@ -223,9 +223,14 @@ server <- function(input, output) {
     }else{data <- data}
     
     data
-    
-  }
-  ))
+  }, options = list(
+    scrollX = TRUE,
+    autoWidth = TRUE,
+    # columnDefs = list(list(width = '2px', targets = "_all")),
+    extensions = c('Buttons', 'Scroller'),
+    buttons = list('excel'),
+    dom = 'lBfrtip'
+  )))
   
   #preprocessing data long form for plots
   scores_forplot <- scores%>%arrange(desc(total_score))

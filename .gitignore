@@ -3,10 +3,8 @@ material/prism/
 material/Progetto Health Big Data WG3_ Modello di Maturità_Applicazione_IFO_IRE.pptx
 material/Progetto Health Big Data WG3_ Modello di Maturità_Applicazione_IFO_IRE_V2.pdf
 material/riepilogo-microsoft-form.pdf
-survey_shiny/bb4FAIR_app/quantitative.xlsx
-survey_shiny/bb4FAIR_app/tiering.xlsx
 survey_shiny/bb4FAIR_app/survey_risposte_240123.xlsx
-survey_shiny/bb4FAIR_app/survey_risposte_completo.xlsx
+quantitative_tiering
 survey_shiny/deployment.R
 *.Rhistory
 rsconnect*
