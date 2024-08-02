@@ -21,11 +21,10 @@ library(openxlsx)
 library(stringr)
 library("writexl")
 
-#setwd("/Users/matteo/OneDrive - CNR/bbmri-it-pnrr/survey-wp4-tiering/tiering")
-quant <- read_excel("./data/quantitativa.xlsx", sheet = "razionale")
+quant <- read_excel("../data/quantitative.xlsx", sheet = "razionale")
 quant <- quant[1:14,1:6]
 quant <- quant[order(quant$id), ]
-survey <- read_excel("./data/survey_risposte_240123_anon.xlsx")
+survey <- read_excel("../data/survey_risposte_240123.xlsx")
 bb <- survey$ID
 survey <- as.data.frame(survey[,c(7:44)]) 
 bb <- paste0("BB", bb)
@@ -35,7 +34,7 @@ bb <- paste0("BB", bb)
 ```{r matrice_punteggi}
 
 
-punteggi <- matrix(0, nrow = length(bb), ncol = length(quant$id), dimnames = list(bb, quant$domanda))
+punteggi <- matrix(0, nrow = length(bb), ncol = length(quant$id), dimnames = list(bb, quant$question))
 
 survey[is.na(survey)] <- "non compilato"
 
@@ -45,8 +44,8 @@ for (n in c(1:length(survey$`In che ruolo si sta compilando questa survey? `)))
   
   if(survey$`In che ruolo si sta compilando questa survey? `[n] == "Referente informatico"){
     
-    punteggi[n,"referente IT"] = quant$completa[1]
-    
+    punteggi[n,"IT contact person"] = quant$complete[1]
+
   }
   
 }
@@ -56,11 +55,11 @@ for (n in c(1:length(survey$`In caso di risposta positiva, indicare quali delle 
  
   if( grepl("Gestione dei dati associati ai campioni", survey$`In caso di risposta positiva, indicare quali delle seguenti attività sono svolte dal personale dedicato della biobanca (risposta multipla)`[n])  ){
     
-    punteggi[n,"personale dedicato"] = quant$completa[2]
+    punteggi[n,"dedicated personnel"] = quant$complete[2]
     
   } else if ((survey$`In caso di risposta positiva, indicare quali delle seguenti attività sono svolte dal personale dedicato della biobanca (risposta multipla)`[n] !="non compilato") && (!("Gestione dei dati associati ai campioni" %in% survey$`In caso di risposta positiva, indicare quali delle seguenti attività sono svolte dal personale dedicato della biobanca (risposta multipla)`[n]))) {
   
-  punteggi[n,"personale dedicato"] = quant$parziale[2]
+  punteggi[n,"dedicated personnel"] = quant$partial[2]
   
 }
   
@@ -75,15 +74,15 @@ for (n in c(1:length(survey$`Se sì, quali? `))) {
  
  if ( term[1] != "non compilato" ) {
    
-   punteggio = (quant$parziale[3]*length(term))
+   punteggio = (quant$partial[3]*length(term))
    
    if (punteggio <= 3) {
      
-   punteggi[n,"ontologie"]  = (quant$parziale[3]*length(term))
+   punteggi[n,"ontologies"]  = (quant$partial[3]*length(term))
      
    } else if (punteggio > 3)  {
      
-     punteggi[n,"ontologie"] = 3
+     punteggi[n,"ontologies"] = 3
      
    }
  }
@@ -96,14 +95,15 @@ for (n in c(1:length(survey[,10]))) {
   
   if(survey[n,10] == "Si"){
     
-    punteggi[n,"CDM"] = quant$completa[4]
+    punteggi[n,"CDM"] = quant$complete[4]
     
   } 
 }
 
 
 #lims T/14
-sist_lims <- c("EASYTRACK", "TDBioBank", "LabVantage","REDcap", "Bio Management","NAUTILUS", "MBioLIMS","FREEZERWORKS","TNGB","Olohealth","SmartLab","SmartyBioB","Noraybank")
+sist_lims <- c("BIMS1", "BIMS2", "BIMS3", "BIMS4", "BIMS5", "BIMS6", "BIMS7", 
+               "BIMS8", "BIMS9", "BIMS10", "BIMS11", "BIMS12", "BIMS13")
 
 for (n in c(1:length(survey$`Se esiste un sistema informatico dedicato, di che tipo è (fornire il nome del sistema)? `))) {
  
@@ -111,35 +111,22 @@ for (n in c(1:length(survey$`Se esiste un sistema informatico dedicato, di che t
     strsplit( ";|- ") %>% 
     unlist()
   
-  lims <- ifelse(grepl("easy", lims, ignore.case = TRUE), "EASYTRACK", lims)
-  lims <- ifelse(grepl("bio manag", lims, ignore.case = TRUE), "Bio Management",lims)
-  lims <- ifelse(grepl("red", lims, ignore.case = TRUE), "REDcap",lims)
-  lims <- ifelse(grepl("td", lims, ignore.case = TRUE), "TDBioBank",lims)
-  lims <- ifelse(grepl("home|house", lims, ignore.case = TRUE), "auto sviluppato",lims)
-  lims <- ifelse(grepl("wins", lims, ignore.case = TRUE), "WINSAP",lims)
-  lims <- ifelse(grepl("FREEZERWORKS", lims, ignore.case = TRUE), "FREEZERWORKS",lims)
-  lims <- ifelse(grepl("labvantage", lims, ignore.case = TRUE), "LabVantage",lims)
-  lims <- ifelse(grepl("tngb", lims, ignore.case = TRUE), "TNGB",lims)
-  lims <- ifelse(grepl("olohealth", lims, ignore.case = TRUE), "Olohealth",lims)
-  lims <- ifelse(grepl("NAUTILUS", lims, ignore.case = TRUE), "NAUTILUS",lims)
-  lims <- ifelse(grepl("smartlab", lims, ignore.case = TRUE), "SmartLab",lims)
-  lims <- ifelse(grepl("MBioLIMS", lims, ignore.case = TRUE), "MBioLIMS",lims)
-  lims <- ifelse(grepl("SmartyBioB", lims, ignore.case = TRUE), "SmartyBioB",lims)
+ 
   
   for (lim in lims) {
     
     if ( lim %in% sist_lims) {
       
-      punteggi[n,"LIMS"] = quant$completa[5]
+      punteggi[n,"LIMS"] = quant$complete[5]
       break
       
     } else if ( lim == "non compilato") {
   
-  punteggi[n,"LIMS"] = quant$vuota[5]
+  punteggi[n,"LIMS"] = quant$empty[5]
   
     } else {
     
-      punteggi[n,"LIMS"] = quant$parziale[5]
+      punteggi[n,"LIMS"] = quant$partial[5]
   }
     
   }
@@ -157,11 +144,11 @@ for (n in c(1:length(survey$`Se esiste un sistema informatico dedicato, questo s
   
   if ( cc == "si" ) {
   
-  punteggi[n,"cartella clinica"] = quant$completa[6]
+  punteggi[n,"clinical record"] = quant$complete[6]
   
   } else {
     
-      punteggi[n,"cartella clinica"] = quant$vuota[6]
+      punteggi[n,"clinical record"] = quant$empty[6]
   }
 }
 
@@ -171,11 +158,11 @@ for (n in c(1:length(survey$`Se NON esiste un sistema informatico dedicato, come
 
    if ( survey[n,16] == "non compilato" ) {
   
-  punteggi[n,"LIMS-2"] = quant$vuota[7]
+  punteggi[n,"LIMS-2"] = quant$empty[7]
   
    }else {
     
-      punteggi[n,"LIMS-2"] = quant$completa[7]
+      punteggi[n,"LIMS-2"] = quant$complete[7]
   }
 }
 
@@ -184,7 +171,7 @@ for (n in c(1:length(survey$`L'istituto ha accesso ad una infrastruttura informa
   
   if ( survey[n,17] == "Si" ) {
   
-  punteggi[n,"Infrastruttura IT"] = quant$completa[8]
+  punteggi[n,"IT infrastructure"] = quant$complete[8]
   
   } 
 }
@@ -195,7 +182,7 @@ for (n in c(1:length(survey$`La biobanca ha a disposizione un sistema di storage
   
    if ( survey[n,19] == "Si" ) {
   
-  punteggi[n,"storage"] = quant$completa[9]
+  punteggi[n,"storage"] = quant$complete[9]
   
   } 
 }
@@ -206,7 +193,7 @@ for (n in c(1:length(survey$`La biobanca può allocare, autonomamente o tramite 
 
   if ( survey[n,20] == "Si" ) {
   
-  punteggi[n,"Componenti IT"] = quant$completa[10]
+  punteggi[n,"IT components"] = quant$complete[10]
   
   } 
 }
@@ -216,34 +203,12 @@ for (n in c(1:length(survey$`L'istituto a cui afferisce la biobanca ha un collet
  
   if (survey[n,22] == "Si" ) {
   
-  punteggi[n,"DWH"] = quant$completa[11]
+  punteggi[n,"DWH"] = quant$complete[11]
   
   } 
 }
 
-#annotazioni 31/AJ
-# for (n in c(1:length(survey[,31]))) {
-#  
-#   ann <- survey[n,31] %>%
-#     strsplit( ";|-") %>% 
-#     unlist()
-#   ann <- ifelse(grepl("no|non|nessun|na|on|dati", ann, ignore.case = TRUE), "no",ann)
-#  
-#   if(length(ann)>2){
-#     
-#     punteggi[n,"annotazioni"] = quant$completa[12]
-#     
-#   } else if (ann[1] == "no"){ 
-# 
-#     punteggi[n,"annotazioni"] = quant$vuota[12]
-#     
-#   } else if ( length(ann)>0 && length(ann)<3) {
-#   
-#   punteggi[n,"annotazioni"] = quant$parziale[12]
-#   
-#   }
-#   
-# }
+
 
 ## annotazioni 30/AI
 for (n in c(1:length(survey[,30]))) {
@@ -252,15 +217,15 @@ for (n in c(1:length(survey[,30]))) {
     strsplit( ";") %>% 
     unlist()
   
-  punteggio = (quant$parziale[12]*length(ann))
+  punteggio = (quant$partial[12]*length(ann))
    
    if (punteggio <= 3) {
      
-   punteggi[n,"annotazioni"]  = (quant$parziale[12]*length(ann))
+   punteggi[n,"annotations"]  = (quant$partial[12]*length(ann))
      
    } else if (punteggio > 3)  {
      
-     punteggi[n,"annotazioni"] = 3
+     punteggi[n,"annotations"] = 3
      
    }
   
@@ -272,11 +237,11 @@ for (n in c(1:length(survey$`Nel rispetto dei requisiti etici-legali previsti, 
  
   if (survey[n,34] == "Si" ) {
   
-  punteggi[n,"intersezione dati clinici"] = quant$completa[13]
+  punteggi[n,"cross-reference data"] = quant$complete[13]
   
   } else {
     
-    punteggi[n,"intersezione dati clinici"] = quant$vuota[13]
+    punteggi[n,"cross-reference data"] = quant$empty[13]
     
   }
 }
@@ -286,11 +251,11 @@ for (n in c(1:length(survey$`Nel rispetto dei requisiti etici-legali previsti, 
  
   if (survey[n,36] == "Si" ) {
   
-  punteggi[n,"consenso informato"] = quant$completa[14]
+  punteggi[n,"informed consent"] = quant$complete[14]
   
   } else {
     
-    punteggi[n,"consenso informato"] = quant$vuota[14]
+    punteggi[n,"informed consent"] = quant$empty[14]
     
   }
 }
@@ -299,111 +264,117 @@ for (n in c(1:length(survey$`Nel rispetto dei requisiti etici-legali previsti, 
 
 ```{r tiering}
 
-punteggio_totale <- vector("integer", length = length(punteggi[,1]))
+total_score <- vector("integer", length = length(punteggi[,1]))
 
-for (n in 1:length(punteggio_totale)) {
+for (n in 1:length(total_score)) {
   
-  punteggio_totale[n] = sum(punteggi[n,])
+  total_score[n] = sum(punteggi[n,])
   
 }
 
 punteggi <- punteggi %>%
-  cbind(punteggio_totale) %>%
+  cbind(total_score) %>%
   as.data.frame()
 
 tier_1 <- data.frame(Biobanca = character(), Punteggio = numeric(), stringsAsFactors = F)
 tier_2 <- data.frame(Biobanca = character(), Punteggio = numeric(), stringsAsFactors = F)
 tier_3 <- data.frame(Biobanca = character(), Punteggio = numeric(), stringsAsFactors = F)
 
-for (score in 1:length(punteggi$punteggio_totale)) {
- 
-  if (punteggi$punteggio_totale[score]>20) {
-    result = c((survey[score,1]), (punteggi[score,15]))
-    tier_1 <- rbind(tier_1, result)
-      
-  } else if (punteggi$punteggio_totale[score]>10){
-    result = c((survey[score,1]), (punteggi[score,15]))
-    tier_2 <- rbind(tier_2, result)
-
-  } else {
-    result = c((survey[score,1]), (punteggi[score,15]))
-    tier_3 <- rbind(tier_3, result)
-    
-  }
-  
-}
+# for (score in 1:length(punteggi$punteggio_totale)) {
+#  
+#   if (punteggi$punteggio_totale[score]>20) {
+#     result = c((survey[score,1]), (punteggi[score,15]))
+#     tier_1 <- rbind(tier_1, result)
+#       
+#   } else if (punteggi$punteggio_totale[score]>10){
+#     result = c((survey[score,1]), (punteggi[score,15]))
+#     tier_2 <- rbind(tier_2, result)
+# 
+#   } else {
+#     result = c((survey[score,1]), (punteggi[score,15]))
+#     tier_3 <- rbind(tier_3, result)
+#     
+#   }
+#   
+# }
 
 ```
 
 ```{r stampa_punteggi}
 
-knitr::kable(punteggi, format="markdown", caption = "sommatoria punteggi")
-knitr::kable(tier_1[order(as.integer(tier_1[,2]), decreasing = T),], format="markdown", col.names = c("Biobanca", "Punteggio"), row.names = F, caption = "Tier 1")
-knitr::kable(tier_2[order(as.integer(tier_2[,2]), decreasing = T),], format="markdown", col.names = c("Biobanca", "Punteggio"),  row.names = F, caption =  "Tier 2")
-knitr::kable(tier_3[order(as.integer(tier_3[,2]), decreasing = T),], format="markdown", col.names = c("Biobanca", "Punteggio"),  row.names = F, caption = "Tier 3")
+# knitr::kable(punteggi, format="markdown", caption = "sommatoria punteggi")
+# knitr::kable(tier_1[order(as.integer(tier_1[,2]), decreasing = T),], format="markdown", col.names = c("Biobanca", "Punteggio"), row.names = F, caption = "Tier 1")
+# knitr::kable(tier_2[order(as.integer(tier_2[,2]), decreasing = T),], format="markdown", col.names = c("Biobanca", "Punteggio"),  row.names = F, caption =  "Tier 2")
+# knitr::kable(tier_3[order(as.integer(tier_3[,2]), decreasing = T),], format="markdown", col.names = c("Biobanca", "Punteggio"),  row.names = F, caption = "Tier 3")
 
 ```
 
 ```{r file_excel}
 
 row <- gsub("\\.", " ", rownames(punteggi))
-punteggi$`Nome biobanca` <- row
+punteggi$`Biobank` <- row
 punteggi <- punteggi %>%
-  relocate(`Nome biobanca`)
+  relocate(`Biobank`)
 
-wb <- createWorkbook()
-addWorksheet(wb, sheetName = "punteggi_totali")
-addWorksheet(wb, sheetName = "tier_1")
-addWorksheet(wb, sheetName = "tier_2")
-addWorksheet(wb, sheetName = "tier_3")
-
-writeData(wb, sheet = "punteggi_totali", punteggi)
-writeData(wb, sheet = "tier_1", tier_1, colNames = F)
-writeData(wb, sheet = "tier_2", tier_2, colNames = F)
-writeData(wb, sheet = "tier_3", tier_3, colNames = F)
-
-saveWorkbook(wb, "punteggi_tiering.xlsx")
 
 ```
 
 ```{r terzili}
 
-punteggi <- punteggi[order(punteggi$punteggio_totale, decreasing = T),]
+punteggi <- punteggi[order(punteggi$total_score, decreasing = T),]
 
 terzile_1 <- data.frame(Biobanca = character(), Punteggio = numeric(), stringsAsFactors = F)
 terzile_2 <- data.frame(Biobanca = character(), Punteggio = numeric(), stringsAsFactors = F)
 terzile_3 <- data.frame(Biobanca = character(), Punteggio = numeric(), stringsAsFactors = F)
 
-max_ter = round((length(punteggi$punteggio_totale)/3))
+max_ter = round((length(punteggi$total_score)/3))
 
-for (num in 1:length(punteggi$punteggio_totale)) { 
+for (num in 1:length(punteggi$total_score)) { 
   
   if (num <= max_ter) {
     
-    biobanca <- data.frame( Biobanca =row[num], Punteggio = punteggi[num,"punteggio_totale"])
+    biobanca <- data.frame( Biobanca =row[num], Punteggio = punteggi[num,"total_score"])
     terzile_1 <- rbind(terzile_1, biobanca)
     
   } else if (num <= max_ter*2) {
     
-    biobanca <- data.frame( Biobanca = row[num], Punteggio = punteggi[num,"punteggio_totale"])
+    biobanca <- data.frame( Biobanca = row[num], Punteggio = punteggi[num,"total_score"])
     terzile_2 <- rbind(terzile_2, biobanca)
     
   } else if (num <= max_ter*3) {
     
-    biobanca <- data.frame( Biobanca = row[num], Punteggio = punteggi[num,"punteggio_totale"])
+    biobanca <- data.frame( Biobanca = row[num], Punteggio = punteggi[num,"total_score"])
     terzile_3 <- rbind(terzile_3, biobanca)
     
   }
 
 }
 
+
+
 ```
 
 ```{r stampa_terzili}
 
-knitr::kable(terzile_1[order(as.integer(terzile_1[,2]), decreasing = T),], format="markdown", col.names = c("Biobanca", "Punteggio"), row.names = F, caption = "Terzile 1")
-knitr::kable(terzile_2[order(as.integer(terzile_2[,2]), decreasing = T),], format="markdown", col.names = c("Biobanca", "Punteggio"),  row.names = F, caption =  "Terzile 2")
-knitr::kable(terzile_3[order(as.integer(terzile_3[,2]), decreasing = T),], format="markdown", col.names = c("Biobanca", "Punteggio"),  row.names = F, caption = "Terzile 3")
+
+
+wb <- createWorkbook()
+addWorksheet(wb, sheetName = "total_score")
+addWorksheet(wb, sheetName = "tier_1")
+addWorksheet(wb, sheetName = "tier_2")
+addWorksheet(wb, sheetName = "tier_3")
+
+
+writeData(wb, sheet = "total_score", punteggi)
+writeData(wb, sheet = "tier_1", terzile_1, colNames = F)
+writeData(wb, sheet = "tier_2", terzile_2, colNames = F)
+writeData(wb, sheet = "tier_3", terzile_3, colNames = F)
+
+saveWorkbook(wb, "tiering_score.xlsx")
+
+# knitr::kable(terzile_1[order(as.integer(terzile_1[,2]), decreasing = T),], format="markdown", col.names = c("Biobanca", "Punteggio"), row.names = F, caption = "Terzile 1")
+# knitr::kable(terzile_2[order(as.integer(terzile_2[,2]), decreasing = T),], format="markdown", col.names = c("Biobanca", "Punteggio"),  row.names = F, caption =  "Terzile 2")
+# knitr::kable(terzile_3[order(as.integer(terzile_3[,2]), decreasing = T),], format="markdown", col.names = c("Biobanca", "Punteggio"),  row.names = F, caption = "Terzile 3")
 
 ```
 

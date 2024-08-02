@@ -445,7 +445,7 @@ display: none;
 </div>
 
 
-<pre class="r"><code>punteggi &lt;- matrix(0, nrow = length(bb), ncol = length(quant$id), dimnames = list(bb, quant$domanda))
+<pre class="r"><code>punteggi &lt;- matrix(0, nrow = length(bb), ncol = length(quant$id), dimnames = list(bb, quant$question))
 
 survey[is.na(survey)] &lt;- &quot;non compilato&quot;
 
@@ -455,8 +455,8 @@ for (n in c(1:length(survey$`In che ruolo si sta compilando questa survey? `)))
   
   if(survey$`In che ruolo si sta compilando questa survey? `[n] == &quot;Referente informatico&quot;){
     
-    punteggi[n,&quot;referente IT&quot;] = quant$completa[1]
-    
+    punteggi[n,&quot;IT contact person&quot;] = quant$complete[1]
+
   }
   
 }
@@ -466,11 +466,11 @@ for (n in c(1:length(survey$`In caso di risposta positiva, indicare quali delle 
  
   if( grepl(&quot;Gestione dei dati associati ai campioni&quot;, survey$`In caso di risposta positiva, indicare quali delle seguenti attività sono svolte dal personale dedicato della biobanca (risposta multipla)`[n])  ){
     
-    punteggi[n,&quot;personale dedicato&quot;] = quant$completa[2]
+    punteggi[n,&quot;dedicated personnel&quot;] = quant$complete[2]
     
   } else if ((survey$`In caso di risposta positiva, indicare quali delle seguenti attività sono svolte dal personale dedicato della biobanca (risposta multipla)`[n] !=&quot;non compilato&quot;) &amp;&amp; (!(&quot;Gestione dei dati associati ai campioni&quot; %in% survey$`In caso di risposta positiva, indicare quali delle seguenti attività sono svolte dal personale dedicato della biobanca (risposta multipla)`[n]))) {
   
-  punteggi[n,&quot;personale dedicato&quot;] = quant$parziale[2]
+  punteggi[n,&quot;dedicated personnel&quot;] = quant$partial[2]
   
 }
   
@@ -485,15 +485,15 @@ for (n in c(1:length(survey$`Se sì, quali? `))) {
  
  if ( term[1] != &quot;non compilato&quot; ) {
    
-   punteggio = (quant$parziale[3]*length(term))
+   punteggio = (quant$partial[3]*length(term))
    
    if (punteggio &lt;= 3) {
      
-   punteggi[n,&quot;ontologie&quot;]  = (quant$parziale[3]*length(term))
+   punteggi[n,&quot;ontologies&quot;]  = (quant$partial[3]*length(term))
      
    } else if (punteggio &gt; 3)  {
      
-     punteggi[n,&quot;ontologie&quot;] = 3
+     punteggi[n,&quot;ontologies&quot;] = 3
      
    }
  }
@@ -506,14 +506,15 @@ for (n in c(1:length(survey[,10]))) {
   
   if(survey[n,10] == &quot;Si&quot;){
     
-    punteggi[n,&quot;CDM&quot;] = quant$completa[4]
+    punteggi[n,&quot;CDM&quot;] = quant$complete[4]
     
   } 
 }
 
 
 #lims T/14
-sist_lims &lt;- c(&quot;EASYTRACK&quot;, &quot;TDBioBank&quot;, &quot;LabVantage&quot;,&quot;REDcap&quot;, &quot;Bio Management&quot;,&quot;NAUTILUS&quot;, &quot;MBioLIMS&quot;,&quot;FREEZERWORKS&quot;,&quot;TNGB&quot;,&quot;Olohealth&quot;,&quot;SmartLab&quot;,&quot;SmartyBioB&quot;,&quot;Noraybank&quot;)
+sist_lims &lt;- c(&quot;BIMS1&quot;, &quot;BIMS2&quot;, &quot;BIMS3&quot;, &quot;BIMS4&quot;, &quot;BIMS5&quot;, &quot;BIMS6&quot;, &quot;BIMS7&quot;, 
+               &quot;BIMS8&quot;, &quot;BIMS9&quot;, &quot;BIMS10&quot;, &quot;BIMS11&quot;, &quot;BIMS12&quot;, &quot;BIMS13&quot;)
 
 for (n in c(1:length(survey$`Se esiste un sistema informatico dedicato, di che tipo è (fornire il nome del sistema)? `))) {
  
@@ -521,35 +522,22 @@ for (n in c(1:length(survey$`Se esiste un sistema informatico dedicato, di che t
     strsplit( &quot;;|- &quot;) %&gt;% 
     unlist()
   
-  lims &lt;- ifelse(grepl(&quot;easy&quot;, lims, ignore.case = TRUE), &quot;EASYTRACK&quot;, lims)
-  lims &lt;- ifelse(grepl(&quot;bio manag&quot;, lims, ignore.case = TRUE), &quot;Bio Management&quot;,lims)
-  lims &lt;- ifelse(grepl(&quot;red&quot;, lims, ignore.case = TRUE), &quot;REDcap&quot;,lims)
-  lims &lt;- ifelse(grepl(&quot;td&quot;, lims, ignore.case = TRUE), &quot;TDBioBank&quot;,lims)
-  lims &lt;- ifelse(grepl(&quot;home|house&quot;, lims, ignore.case = TRUE), &quot;auto sviluppato&quot;,lims)
-  lims &lt;- ifelse(grepl(&quot;wins&quot;, lims, ignore.case = TRUE), &quot;WINSAP&quot;,lims)
-  lims &lt;- ifelse(grepl(&quot;FREEZERWORKS&quot;, lims, ignore.case = TRUE), &quot;FREEZERWORKS&quot;,lims)
-  lims &lt;- ifelse(grepl(&quot;labvantage&quot;, lims, ignore.case = TRUE), &quot;LabVantage&quot;,lims)
-  lims &lt;- ifelse(grepl(&quot;tngb&quot;, lims, ignore.case = TRUE), &quot;TNGB&quot;,lims)
-  lims &lt;- ifelse(grepl(&quot;olohealth&quot;, lims, ignore.case = TRUE), &quot;Olohealth&quot;,lims)
-  lims &lt;- ifelse(grepl(&quot;NAUTILUS&quot;, lims, ignore.case = TRUE), &quot;NAUTILUS&quot;,lims)
-  lims &lt;- ifelse(grepl(&quot;smartlab&quot;, lims, ignore.case = TRUE), &quot;SmartLab&quot;,lims)
-  lims &lt;- ifelse(grepl(&quot;MBioLIMS&quot;, lims, ignore.case = TRUE), &quot;MBioLIMS&quot;,lims)
-  lims &lt;- ifelse(grepl(&quot;SmartyBioB&quot;, lims, ignore.case = TRUE), &quot;SmartyBioB&quot;,lims)
+ 
   
   for (lim in lims) {
     
     if ( lim %in% sist_lims) {
       
-      punteggi[n,&quot;LIMS&quot;] = quant$completa[5]
+      punteggi[n,&quot;LIMS&quot;] = quant$complete[5]
       break
       
     } else if ( lim == &quot;non compilato&quot;) {
   
-  punteggi[n,&quot;LIMS&quot;] = quant$vuota[5]
+  punteggi[n,&quot;LIMS&quot;] = quant$empty[5]
   
     } else {
     
-      punteggi[n,&quot;LIMS&quot;] = quant$parziale[5]
+      punteggi[n,&quot;LIMS&quot;] = quant$partial[5]
   }
     
   }
@@ -567,11 +555,11 @@ for (n in c(1:length(survey$`Se esiste un sistema informatico dedicato, questo s
   
   if ( cc == &quot;si&quot; ) {
   
-  punteggi[n,&quot;cartella clinica&quot;] = quant$completa[6]
+  punteggi[n,&quot;clinical record&quot;] = quant$complete[6]
   
   } else {
     
-      punteggi[n,&quot;cartella clinica&quot;] = quant$vuota[6]
+      punteggi[n,&quot;clinical record&quot;] = quant$empty[6]
   }
 }
 
@@ -581,11 +569,11 @@ for (n in c(1:length(survey$`Se NON esiste un sistema informatico dedicato, come
 
    if ( survey[n,16] == &quot;non compilato&quot; ) {
   
-  punteggi[n,&quot;LIMS-2&quot;] = quant$vuota[7]
+  punteggi[n,&quot;LIMS-2&quot;] = quant$empty[7]
   
    }else {
     
-      punteggi[n,&quot;LIMS-2&quot;] = quant$completa[7]
+      punteggi[n,&quot;LIMS-2&quot;] = quant$complete[7]
   }
 }
 
@@ -594,7 +582,7 @@ for (n in c(1:length(survey$`L&#39;istituto ha accesso ad una infrastruttura inf
   
   if ( survey[n,17] == &quot;Si&quot; ) {
   
-  punteggi[n,&quot;Infrastruttura IT&quot;] = quant$completa[8]
+  punteggi[n,&quot;IT infrastructure&quot;] = quant$complete[8]
   
   } 
 }
@@ -605,7 +593,7 @@ for (n in c(1:length(survey$`La biobanca ha a disposizione un sistema di storage
   
    if ( survey[n,19] == &quot;Si&quot; ) {
   
-  punteggi[n,&quot;storage&quot;] = quant$completa[9]
+  punteggi[n,&quot;storage&quot;] = quant$complete[9]
   
   } 
 }
@@ -616,7 +604,7 @@ for (n in c(1:length(survey$`La biobanca può allocare, autonomamente o tramite 
 
   if ( survey[n,20] == &quot;Si&quot; ) {
   
-  punteggi[n,&quot;Componenti IT&quot;] = quant$completa[10]
+  punteggi[n,&quot;IT components&quot;] = quant$complete[10]
   
   } 
 }
@@ -626,34 +614,12 @@ for (n in c(1:length(survey$`L&#39;istituto a cui afferisce la biobanca ha un co
  
   if (survey[n,22] == &quot;Si&quot; ) {
   
-  punteggi[n,&quot;DWH&quot;] = quant$completa[11]
+  punteggi[n,&quot;DWH&quot;] = quant$complete[11]
   
   } 
 }
 
-#annotazioni 31/AJ
-# for (n in c(1:length(survey[,31]))) {
-#  
-#   ann &lt;- survey[n,31] %&gt;%
-#     strsplit( &quot;;|-&quot;) %&gt;% 
-#     unlist()
-#   ann &lt;- ifelse(grepl(&quot;no|non|nessun|na|on|dati&quot;, ann, ignore.case = TRUE), &quot;no&quot;,ann)
-#  
-#   if(length(ann)&gt;2){
-#     
-#     punteggi[n,&quot;annotazioni&quot;] = quant$completa[12]
-#     
-#   } else if (ann[1] == &quot;no&quot;){ 
-# 
-#     punteggi[n,&quot;annotazioni&quot;] = quant$vuota[12]
-#     
-#   } else if ( length(ann)&gt;0 &amp;&amp; length(ann)&lt;3) {
-#   
-#   punteggi[n,&quot;annotazioni&quot;] = quant$parziale[12]
-#   
-#   }
-#   
-# }
+
 
 ## annotazioni 30/AI
 for (n in c(1:length(survey[,30]))) {
@@ -662,15 +628,15 @@ for (n in c(1:length(survey[,30]))) {
     strsplit( &quot;;&quot;) %&gt;% 
     unlist()
   
-  punteggio = (quant$parziale[12]*length(ann))
+  punteggio = (quant$partial[12]*length(ann))
    
    if (punteggio &lt;= 3) {
      
-   punteggi[n,&quot;annotazioni&quot;]  = (quant$parziale[12]*length(ann))
+   punteggi[n,&quot;annotations&quot;]  = (quant$partial[12]*length(ann))
      
    } else if (punteggio &gt; 3)  {
      
-     punteggi[n,&quot;annotazioni&quot;] = 3
+     punteggi[n,&quot;annotations&quot;] = 3
      
    }
   
@@ -682,11 +648,11 @@ for (n in c(1:length(survey$`Nel rispetto dei requisiti etici-legali previsti, 
  
   if (survey[n,34] == &quot;Si&quot; ) {
   
-  punteggi[n,&quot;intersezione dati clinici&quot;] = quant$completa[13]
+  punteggi[n,&quot;cross-reference data&quot;] = quant$complete[13]
   
   } else {
     
-    punteggi[n,&quot;intersezione dati clinici&quot;] = quant$vuota[13]
+    punteggi[n,&quot;cross-reference data&quot;] = quant$empty[13]
     
   }
 }
@@ -696,1430 +662,99 @@ for (n in c(1:length(survey$`Nel rispetto dei requisiti etici-legali previsti, 
  
   if (survey[n,36] == &quot;Si&quot; ) {
   
-  punteggi[n,&quot;consenso informato&quot;] = quant$completa[14]
+  punteggi[n,&quot;informed consent&quot;] = quant$complete[14]
   
   } else {
     
-    punteggi[n,&quot;consenso informato&quot;] = quant$vuota[14]
+    punteggi[n,&quot;informed consent&quot;] = quant$empty[14]
     
   }
 }</code></pre>
-<pre class="r"><code>punteggio_totale &lt;- vector(&quot;integer&quot;, length = length(punteggi[,1]))
+<pre class="r"><code>total_score &lt;- vector(&quot;integer&quot;, length = length(punteggi[,1]))
 
-for (n in 1:length(punteggio_totale)) {
+for (n in 1:length(total_score)) {
   
-  punteggio_totale[n] = sum(punteggi[n,])
+  total_score[n] = sum(punteggi[n,])
   
 }
 
 punteggi &lt;- punteggi %&gt;%
-  cbind(punteggio_totale) %&gt;%
+  cbind(total_score) %&gt;%
   as.data.frame()
 
 tier_1 &lt;- data.frame(Biobanca = character(), Punteggio = numeric(), stringsAsFactors = F)
 tier_2 &lt;- data.frame(Biobanca = character(), Punteggio = numeric(), stringsAsFactors = F)
 tier_3 &lt;- data.frame(Biobanca = character(), Punteggio = numeric(), stringsAsFactors = F)
 
-for (score in 1:length(punteggi$punteggio_totale)) {
- 
-  if (punteggi$punteggio_totale[score]&gt;20) {
-    result = c((survey[score,1]), (punteggi[score,15]))
-    tier_1 &lt;- rbind(tier_1, result)
-      
-  } else if (punteggi$punteggio_totale[score]&gt;10){
-    result = c((survey[score,1]), (punteggi[score,15]))
-    tier_2 &lt;- rbind(tier_2, result)
-
-  } else {
-    result = c((survey[score,1]), (punteggi[score,15]))
-    tier_3 &lt;- rbind(tier_3, result)
-    
-  }
-  
-}</code></pre>
-<pre class="r"><code>knitr::kable(punteggi, format=&quot;markdown&quot;, caption = &quot;sommatoria punteggi&quot;)</code></pre>
-<table style="width:100%;">
-<caption>sommatoria punteggi</caption>
-<colgroup>
-<col width="2%" />
-<col width="6%" />
-<col width="9%" />
-<col width="5%" />
-<col width="2%" />
-<col width="2%" />
-<col width="8%" />
-<col width="3%" />
-<col width="9%" />
-<col width="4%" />
-<col width="7%" />
-<col width="2%" />
-<col width="6%" />
-<col width="13%" />
-<col width="9%" />
-<col width="8%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left"></th>
-<th align="right">referente IT</th>
-<th align="right">personale dedicato</th>
-<th align="right">ontologie</th>
-<th align="right">CDM</th>
-<th align="right">LIMS</th>
-<th align="right">cartella clinica</th>
-<th align="right">LIMS-2</th>
-<th align="right">Infrastruttura IT</th>
-<th align="right">storage</th>
-<th align="right">Componenti IT</th>
-<th align="right">DWH</th>
-<th align="right">annotazioni</th>
-<th align="right">intersezione dati clinici</th>
-<th align="right">consenso informato</th>
-<th align="right">punteggio_totale</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">BB1</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">8</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">2</td>
-<td align="right">3</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">24</td>
-</tr>
-<tr class="even">
-<td align="left">BB2</td>
-<td align="right">1</td>
-<td align="right">4</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">8</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">20</td>
-</tr>
-<tr class="odd">
-<td align="left">BB3</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">8</td>
-</tr>
-<tr class="even">
-<td align="left">BB4</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">8</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">21</td>
-</tr>
-<tr class="odd">
-<td align="left">BB5</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">3</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">2</td>
-<td align="right">3</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">19</td>
-</tr>
-<tr class="even">
-<td align="left">BB6</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">3</td>
-<td align="right">0</td>
-<td align="right">8</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">25</td>
-</tr>
-<tr class="odd">
-<td align="left">BB7</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">8</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">3</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">20</td>
-</tr>
-<tr class="even">
-<td align="left">BB8</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">8</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">14</td>
-</tr>
-<tr class="odd">
-<td align="left">BB9</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">8</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">13</td>
-</tr>
-<tr class="even">
-<td align="left">BB10</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">8</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">15</td>
-</tr>
-<tr class="odd">
-<td align="left">BB11</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">8</td>
-</tr>
-<tr class="even">
-<td align="left">BB12</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">13</td>
-</tr>
-<tr class="odd">
-<td align="left">BB13</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">3</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">2</td>
-<td align="right">3</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">15</td>
-</tr>
-<tr class="even">
-<td align="left">BB14</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">8</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">3</td>
-<td align="right">20</td>
-</tr>
-<tr class="odd">
-<td align="left">BB15</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">3</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">15</td>
-</tr>
-<tr class="even">
-<td align="left">BB16</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">8</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">2</td>
-<td align="right">3</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">26</td>
-</tr>
-<tr class="odd">
-<td align="left">BB17</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">3</td>
-<td align="right">0</td>
-<td align="right">8</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">2</td>
-<td align="right">3</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">26</td>
-</tr>
-<tr class="even">
-<td align="left">BB18</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">8</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">17</td>
-</tr>
-<tr class="odd">
-<td align="left">BB19</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">3</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">18</td>
-</tr>
-<tr class="even">
-<td align="left">BB20</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">2</td>
-<td align="right">3</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">13</td>
-</tr>
-<tr class="odd">
-<td align="left">BB21</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">8</td>
-</tr>
-<tr class="even">
-<td align="left">BB22</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">8</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">2</td>
-<td align="right">3</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">28</td>
-</tr>
-<tr class="odd">
-<td align="left">BB23</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">8</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">13</td>
-</tr>
-<tr class="even">
-<td align="left">BB24</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">2</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">9</td>
-</tr>
-<tr class="odd">
-<td align="left">BB25</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">3</td>
-<td align="right">1</td>
-<td align="right">8</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">23</td>
-</tr>
-<tr class="even">
-<td align="left">BB26</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">3</td>
-<td align="right">0</td>
-<td align="right">8</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">22</td>
-</tr>
-<tr class="odd">
-<td align="left">BB27</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">3</td>
-<td align="right">0</td>
-<td align="right">8</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">2</td>
-<td align="right">3</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">26</td>
-</tr>
-<tr class="even">
-<td align="left">BB28</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">5</td>
-</tr>
-<tr class="odd">
-<td align="left">BB29</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">8</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">2</td>
-<td align="right">3</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">21</td>
-</tr>
-<tr class="even">
-<td align="left">BB30</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">8</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">2</td>
-<td align="right">3</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">22</td>
-</tr>
-<tr class="odd">
-<td align="left">BB31</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">8</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">17</td>
-</tr>
-<tr class="even">
-<td align="left">BB32</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">12</td>
-</tr>
-<tr class="odd">
-<td align="left">BB33</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">14</td>
-</tr>
-<tr class="even">
-<td align="left">BB34</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">3</td>
-<td align="right">1</td>
-<td align="right">8</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">23</td>
-</tr>
-<tr class="odd">
-<td align="left">BB35</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">8</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">3</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">17</td>
-</tr>
-<tr class="even">
-<td align="left">BB36</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">3</td>
-<td align="right">1</td>
-<td align="right">8</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">2</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">25</td>
-</tr>
-<tr class="odd">
-<td align="left">BB37</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">14</td>
-</tr>
-<tr class="even">
-<td align="left">BB38</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">13</td>
-</tr>
-<tr class="odd">
-<td align="left">BB39</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">3</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">15</td>
-</tr>
-<tr class="even">
-<td align="left">BB40</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">2</td>
-<td align="right">3</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">15</td>
-</tr>
-<tr class="odd">
-<td align="left">BB41</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">3</td>
-</tr>
-<tr class="even">
-<td align="left">BB42</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">13</td>
-</tr>
-<tr class="odd">
-<td align="left">BB43</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">3</td>
-<td align="right">1</td>
-<td align="right">8</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">2</td>
-<td align="right">3</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">28</td>
-</tr>
-<tr class="even">
-<td align="left">BB44</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">8</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">21</td>
-</tr>
-<tr class="odd">
-<td align="left">BB45</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">11</td>
-</tr>
-<tr class="even">
-<td align="left">BB46</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">4</td>
-</tr>
-<tr class="odd">
-<td align="left">BB47</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">9</td>
-</tr>
-</tbody>
-</table>
-<pre class="r"><code>knitr::kable(tier_1[order(as.integer(tier_1[,2]), decreasing = T),], format=&quot;markdown&quot;, col.names = c(&quot;Biobanca&quot;, &quot;Punteggio&quot;), row.names = F, caption = &quot;Tier 1&quot;)</code></pre>
-<table>
-<caption>Tier 1</caption>
-<thead>
-<tr class="header">
-<th align="right">Biobanca</th>
-<th align="right">Punteggio</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="right">22</td>
-<td align="right">28</td>
-</tr>
-<tr class="even">
-<td align="right">43</td>
-<td align="right">28</td>
-</tr>
-<tr class="odd">
-<td align="right">16</td>
-<td align="right">26</td>
-</tr>
-<tr class="even">
-<td align="right">17</td>
-<td align="right">26</td>
-</tr>
-<tr class="odd">
-<td align="right">27</td>
-<td align="right">26</td>
-</tr>
-<tr class="even">
-<td align="right">6</td>
-<td align="right">25</td>
-</tr>
-<tr class="odd">
-<td align="right">36</td>
-<td align="right">25</td>
-</tr>
-<tr class="even">
-<td align="right">1</td>
-<td align="right">24</td>
-</tr>
-<tr class="odd">
-<td align="right">25</td>
-<td align="right">23</td>
-</tr>
-<tr class="even">
-<td align="right">34</td>
-<td align="right">23</td>
-</tr>
-<tr class="odd">
-<td align="right">26</td>
-<td align="right">22</td>
-</tr>
-<tr class="even">
-<td align="right">30</td>
-<td align="right">22</td>
-</tr>
-<tr class="odd">
-<td align="right">4</td>
-<td align="right">21</td>
-</tr>
-<tr class="even">
-<td align="right">29</td>
-<td align="right">21</td>
-</tr>
-<tr class="odd">
-<td align="right">44</td>
-<td align="right">21</td>
-</tr>
-</tbody>
-</table>
-<pre class="r"><code>knitr::kable(tier_2[order(as.integer(tier_2[,2]), decreasing = T),], format=&quot;markdown&quot;, col.names = c(&quot;Biobanca&quot;, &quot;Punteggio&quot;),  row.names = F, caption =  &quot;Tier 2&quot;)</code></pre>
-<table>
-<caption>Tier 2</caption>
-<thead>
-<tr class="header">
-<th align="right">Biobanca</th>
-<th align="right">Punteggio</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="right">2</td>
-<td align="right">20</td>
-</tr>
-<tr class="even">
-<td align="right">7</td>
-<td align="right">20</td>
-</tr>
-<tr class="odd">
-<td align="right">14</td>
-<td align="right">20</td>
-</tr>
-<tr class="even">
-<td align="right">5</td>
-<td align="right">19</td>
-</tr>
-<tr class="odd">
-<td align="right">19</td>
-<td align="right">18</td>
-</tr>
-<tr class="even">
-<td align="right">18</td>
-<td align="right">17</td>
-</tr>
-<tr class="odd">
-<td align="right">31</td>
-<td align="right">17</td>
-</tr>
-<tr class="even">
-<td align="right">35</td>
-<td align="right">17</td>
-</tr>
-<tr class="odd">
-<td align="right">10</td>
-<td align="right">15</td>
-</tr>
-<tr class="even">
-<td align="right">13</td>
-<td align="right">15</td>
-</tr>
-<tr class="odd">
-<td align="right">15</td>
-<td align="right">15</td>
-</tr>
-<tr class="even">
-<td align="right">39</td>
-<td align="right">15</td>
-</tr>
-<tr class="odd">
-<td align="right">40</td>
-<td align="right">15</td>
-</tr>
-<tr class="even">
-<td align="right">8</td>
-<td align="right">14</td>
-</tr>
-<tr class="odd">
-<td align="right">33</td>
-<td align="right">14</td>
-</tr>
-<tr class="even">
-<td align="right">37</td>
-<td align="right">14</td>
-</tr>
-<tr class="odd">
-<td align="right">9</td>
-<td align="right">13</td>
-</tr>
-<tr class="even">
-<td align="right">12</td>
-<td align="right">13</td>
-</tr>
-<tr class="odd">
-<td align="right">20</td>
-<td align="right">13</td>
-</tr>
-<tr class="even">
-<td align="right">23</td>
-<td align="right">13</td>
-</tr>
-<tr class="odd">
-<td align="right">38</td>
-<td align="right">13</td>
-</tr>
-<tr class="even">
-<td align="right">42</td>
-<td align="right">13</td>
-</tr>
-<tr class="odd">
-<td align="right">32</td>
-<td align="right">12</td>
-</tr>
-<tr class="even">
-<td align="right">45</td>
-<td align="right">11</td>
-</tr>
-</tbody>
-</table>
-<pre class="r"><code>knitr::kable(tier_3[order(as.integer(tier_3[,2]), decreasing = T),], format=&quot;markdown&quot;, col.names = c(&quot;Biobanca&quot;, &quot;Punteggio&quot;),  row.names = F, caption = &quot;Tier 3&quot;)</code></pre>
-<table>
-<caption>Tier 3</caption>
-<thead>
-<tr class="header">
-<th align="right">Biobanca</th>
-<th align="right">Punteggio</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="right">24</td>
-<td align="right">9</td>
-</tr>
-<tr class="even">
-<td align="right">47</td>
-<td align="right">9</td>
-</tr>
-<tr class="odd">
-<td align="right">3</td>
-<td align="right">8</td>
-</tr>
-<tr class="even">
-<td align="right">11</td>
-<td align="right">8</td>
-</tr>
-<tr class="odd">
-<td align="right">21</td>
-<td align="right">8</td>
-</tr>
-<tr class="even">
-<td align="right">28</td>
-<td align="right">5</td>
-</tr>
-<tr class="odd">
-<td align="right">46</td>
-<td align="right">4</td>
-</tr>
-<tr class="even">
-<td align="right">41</td>
-<td align="right">3</td>
-</tr>
-</tbody>
-</table>
+# for (score in 1:length(punteggi$punteggio_totale)) {
+#  
+#   if (punteggi$punteggio_totale[score]&gt;20) {
+#     result = c((survey[score,1]), (punteggi[score,15]))
+#     tier_1 &lt;- rbind(tier_1, result)
+#       
+#   } else if (punteggi$punteggio_totale[score]&gt;10){
+#     result = c((survey[score,1]), (punteggi[score,15]))
+#     tier_2 &lt;- rbind(tier_2, result)
+# 
+#   } else {
+#     result = c((survey[score,1]), (punteggi[score,15]))
+#     tier_3 &lt;- rbind(tier_3, result)
+#     
+#   }
+#   
+# }</code></pre>
+<pre class="r"><code># knitr::kable(punteggi, format=&quot;markdown&quot;, caption = &quot;sommatoria punteggi&quot;)
+# knitr::kable(tier_1[order(as.integer(tier_1[,2]), decreasing = T),], format=&quot;markdown&quot;, col.names = c(&quot;Biobanca&quot;, &quot;Punteggio&quot;), row.names = F, caption = &quot;Tier 1&quot;)
+# knitr::kable(tier_2[order(as.integer(tier_2[,2]), decreasing = T),], format=&quot;markdown&quot;, col.names = c(&quot;Biobanca&quot;, &quot;Punteggio&quot;),  row.names = F, caption =  &quot;Tier 2&quot;)
+# knitr::kable(tier_3[order(as.integer(tier_3[,2]), decreasing = T),], format=&quot;markdown&quot;, col.names = c(&quot;Biobanca&quot;, &quot;Punteggio&quot;),  row.names = F, caption = &quot;Tier 3&quot;)</code></pre>
 <pre class="r"><code>row &lt;- gsub(&quot;\\.&quot;, &quot; &quot;, rownames(punteggi))
-punteggi$`Nome biobanca` &lt;- row
+punteggi$`Biobank` &lt;- row
 punteggi &lt;- punteggi %&gt;%
-  relocate(`Nome biobanca`)
+  relocate(`Biobank`)
 
 wb &lt;- createWorkbook()
-addWorksheet(wb, sheetName = &quot;punteggi_totali&quot;)
+addWorksheet(wb, sheetName = &quot;total_score&quot;)
 addWorksheet(wb, sheetName = &quot;tier_1&quot;)
 addWorksheet(wb, sheetName = &quot;tier_2&quot;)
-addWorksheet(wb, sheetName = &quot;tier_3&quot;)
-
-writeData(wb, sheet = &quot;punteggi_totali&quot;, punteggi)
-writeData(wb, sheet = &quot;tier_1&quot;, tier_1, colNames = F)
-writeData(wb, sheet = &quot;tier_2&quot;, tier_2, colNames = F)
-writeData(wb, sheet = &quot;tier_3&quot;, tier_3, colNames = F)
-
-saveWorkbook(wb, &quot;punteggi_tiering.xlsx&quot;)</code></pre>
-<pre class="r"><code>punteggi &lt;- punteggi[order(punteggi$punteggio_totale, decreasing = T),]
+addWorksheet(wb, sheetName = &quot;tier_3&quot;)</code></pre>
+<pre class="r"><code>punteggi &lt;- punteggi[order(punteggi$total_score, decreasing = T),]
 
 terzile_1 &lt;- data.frame(Biobanca = character(), Punteggio = numeric(), stringsAsFactors = F)
 terzile_2 &lt;- data.frame(Biobanca = character(), Punteggio = numeric(), stringsAsFactors = F)
 terzile_3 &lt;- data.frame(Biobanca = character(), Punteggio = numeric(), stringsAsFactors = F)
 
-max_ter = round((length(punteggi$punteggio_totale)/3))
+max_ter = round((length(punteggi$total_score)/3))
 
-for (num in 1:length(punteggi$punteggio_totale)) { 
+for (num in 1:length(punteggi$total_score)) { 
   
   if (num &lt;= max_ter) {
     
-    biobanca &lt;- data.frame( Biobanca =row[num], Punteggio = punteggi[num,&quot;punteggio_totale&quot;])
+    biobanca &lt;- data.frame( Biobanca =row[num], Punteggio = punteggi[num,&quot;total_score&quot;])
     terzile_1 &lt;- rbind(terzile_1, biobanca)
     
   } else if (num &lt;= max_ter*2) {
     
-    biobanca &lt;- data.frame( Biobanca = row[num], Punteggio = punteggi[num,&quot;punteggio_totale&quot;])
+    biobanca &lt;- data.frame( Biobanca = row[num], Punteggio = punteggi[num,&quot;total_score&quot;])
     terzile_2 &lt;- rbind(terzile_2, biobanca)
     
   } else if (num &lt;= max_ter*3) {
     
-    biobanca &lt;- data.frame( Biobanca = row[num], Punteggio = punteggi[num,&quot;punteggio_totale&quot;])
+    biobanca &lt;- data.frame( Biobanca = row[num], Punteggio = punteggi[num,&quot;total_score&quot;])
     terzile_3 &lt;- rbind(terzile_3, biobanca)
     
   }
 
 }</code></pre>
-<pre class="r"><code>knitr::kable(terzile_1[order(as.integer(terzile_1[,2]), decreasing = T),], format=&quot;markdown&quot;, col.names = c(&quot;Biobanca&quot;, &quot;Punteggio&quot;), row.names = F, caption = &quot;Terzile 1&quot;)</code></pre>
-<table>
-<caption>Terzile 1</caption>
-<thead>
-<tr class="header">
-<th align="left">Biobanca</th>
-<th align="right">Punteggio</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">BB1</td>
-<td align="right">28</td>
-</tr>
-<tr class="even">
-<td align="left">BB2</td>
-<td align="right">28</td>
-</tr>
-<tr class="odd">
-<td align="left">BB3</td>
-<td align="right">26</td>
-</tr>
-<tr class="even">
-<td align="left">BB4</td>
-<td align="right">26</td>
-</tr>
-<tr class="odd">
-<td align="left">BB5</td>
-<td align="right">26</td>
-</tr>
-<tr class="even">
-<td align="left">BB6</td>
-<td align="right">25</td>
-</tr>
-<tr class="odd">
-<td align="left">BB7</td>
-<td align="right">25</td>
-</tr>
-<tr class="even">
-<td align="left">BB8</td>
-<td align="right">24</td>
-</tr>
-<tr class="odd">
-<td align="left">BB9</td>
-<td align="right">23</td>
-</tr>
-<tr class="even">
-<td align="left">BB10</td>
-<td align="right">23</td>
-</tr>
-<tr class="odd">
-<td align="left">BB11</td>
-<td align="right">22</td>
-</tr>
-<tr class="even">
-<td align="left">BB12</td>
-<td align="right">22</td>
-</tr>
-<tr class="odd">
-<td align="left">BB13</td>
-<td align="right">21</td>
-</tr>
-<tr class="even">
-<td align="left">BB14</td>
-<td align="right">21</td>
-</tr>
-<tr class="odd">
-<td align="left">BB15</td>
-<td align="right">21</td>
-</tr>
-<tr class="even">
-<td align="left">BB16</td>
-<td align="right">20</td>
-</tr>
-</tbody>
-</table>
-<pre class="r"><code>knitr::kable(terzile_2[order(as.integer(terzile_2[,2]), decreasing = T),], format=&quot;markdown&quot;, col.names = c(&quot;Biobanca&quot;, &quot;Punteggio&quot;),  row.names = F, caption =  &quot;Terzile 2&quot;)</code></pre>
-<table>
-<caption>Terzile 2</caption>
-<thead>
-<tr class="header">
-<th align="left">Biobanca</th>
-<th align="right">Punteggio</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">BB17</td>
-<td align="right">20</td>
-</tr>
-<tr class="even">
-<td align="left">BB18</td>
-<td align="right">20</td>
-</tr>
-<tr class="odd">
-<td align="left">BB19</td>
-<td align="right">19</td>
-</tr>
-<tr class="even">
-<td align="left">BB20</td>
-<td align="right">18</td>
-</tr>
-<tr class="odd">
-<td align="left">BB21</td>
-<td align="right">17</td>
-</tr>
-<tr class="even">
-<td align="left">BB22</td>
-<td align="right">17</td>
-</tr>
-<tr class="odd">
-<td align="left">BB23</td>
-<td align="right">17</td>
-</tr>
-<tr class="even">
-<td align="left">BB24</td>
-<td align="right">15</td>
-</tr>
-<tr class="odd">
-<td align="left">BB25</td>
-<td align="right">15</td>
-</tr>
-<tr class="even">
-<td align="left">BB26</td>
-<td align="right">15</td>
-</tr>
-<tr class="odd">
-<td align="left">BB27</td>
-<td align="right">15</td>
-</tr>
-<tr class="even">
-<td align="left">BB28</td>
-<td align="right">15</td>
-</tr>
-<tr class="odd">
-<td align="left">BB29</td>
-<td align="right">14</td>
-</tr>
-<tr class="even">
-<td align="left">BB30</td>
-<td align="right">14</td>
-</tr>
-<tr class="odd">
-<td align="left">BB31</td>
-<td align="right">14</td>
-</tr>
-<tr class="even">
-<td align="left">BB32</td>
-<td align="right">13</td>
-</tr>
-</tbody>
-</table>
-<pre class="r"><code>knitr::kable(terzile_3[order(as.integer(terzile_3[,2]), decreasing = T),], format=&quot;markdown&quot;, col.names = c(&quot;Biobanca&quot;, &quot;Punteggio&quot;),  row.names = F, caption = &quot;Terzile 3&quot;)</code></pre>
-<table>
-<caption>Terzile 3</caption>
-<thead>
-<tr class="header">
-<th align="left">Biobanca</th>
-<th align="right">Punteggio</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">BB33</td>
-<td align="right">13</td>
-</tr>
-<tr class="even">
-<td align="left">BB34</td>
-<td align="right">13</td>
-</tr>
-<tr class="odd">
-<td align="left">BB35</td>
-<td align="right">13</td>
-</tr>
-<tr class="even">
-<td align="left">BB36</td>
-<td align="right">13</td>
-</tr>
-<tr class="odd">
-<td align="left">BB37</td>
-<td align="right">13</td>
-</tr>
-<tr class="even">
-<td align="left">BB38</td>
-<td align="right">12</td>
-</tr>
-<tr class="odd">
-<td align="left">BB39</td>
-<td align="right">11</td>
-</tr>
-<tr class="even">
-<td align="left">BB40</td>
-<td align="right">9</td>
-</tr>
-<tr class="odd">
-<td align="left">BB41</td>
-<td align="right">9</td>
-</tr>
-<tr class="even">
-<td align="left">BB42</td>
-<td align="right">8</td>
-</tr>
-<tr class="odd">
-<td align="left">BB43</td>
-<td align="right">8</td>
-</tr>
-<tr class="even">
-<td align="left">BB44</td>
-<td align="right">8</td>
-</tr>
-<tr class="odd">
-<td align="left">BB45</td>
-<td align="right">5</td>
-</tr>
-<tr class="even">
-<td align="left">BB46</td>
-<td align="right">4</td>
-</tr>
-<tr class="odd">
-<td align="left">BB47</td>
-<td align="right">3</td>
-</tr>
-</tbody>
-</table>
+<pre class="r"><code>writeData(wb, sheet = &quot;total_score&quot;, punteggi)
+writeData(wb, sheet = &quot;tier_1&quot;, terzile_1, colNames = F)
+writeData(wb, sheet = &quot;tier_2&quot;, terzile_2, colNames = F)
+writeData(wb, sheet = &quot;tier_3&quot;, terzile_3, colNames = F)
+
+saveWorkbook(wb, &quot;tiering_score.xlsx&quot;)
+
+# knitr::kable(terzile_1[order(as.integer(terzile_1[,2]), decreasing = T),], format=&quot;markdown&quot;, col.names = c(&quot;Biobanca&quot;, &quot;Punteggio&quot;), row.names = F, caption = &quot;Terzile 1&quot;)
+# knitr::kable(terzile_2[order(as.integer(terzile_2[,2]), decreasing = T),], format=&quot;markdown&quot;, col.names = c(&quot;Biobanca&quot;, &quot;Punteggio&quot;),  row.names = F, caption =  &quot;Terzile 2&quot;)
+# knitr::kable(terzile_3[order(as.integer(terzile_3[,2]), decreasing = T),], format=&quot;markdown&quot;, col.names = c(&quot;Biobanca&quot;, &quot;Punteggio&quot;),  row.names = F, caption = &quot;Terzile 3&quot;)</code></pre>
 
 
 
