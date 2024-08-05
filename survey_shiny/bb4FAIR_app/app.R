@@ -219,9 +219,17 @@ server <- function(input, output) {
         final_cols <- c(final_cols, selected_cols)
         data[[colname]] <- rowSums(data[, selected_cols])}
       
+
       data <- data[, c(final_cols, "tier", macro_scores, "total_score")]
+      
     }else{data <- data}
-    
+    colnames(data) <- c("Biobank ID", "IT head" ,"dedicated personnel",       
+                        "ontologies richness", "common data models",        
+                        "BIMS", "data management",           
+                        "IT infrastructures", "massive storage",           
+                        "IT components", "data warehouse",            
+                        "clinical data availability", "annotations",               
+                        "registry data availability", "informed consent", "total_score", "tier")
     data
   }, options = list(
     scrollX = TRUE,
