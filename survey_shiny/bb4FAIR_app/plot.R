@@ -36,25 +36,24 @@ mycolors <- c("#8dd3c7", "#fdb462", "#bebada", "#fb8072", "#80b1d3", "#dfc27d", 
 
 
 
-# dedicated personnel ----------------------
+# dedicated personnel  ----------------------------------------------------
 
-p_dedicato <- as.data.frame(table(survey[[5]]), stringsAsFactors = FALSE)
+bb_personnel <- as.data.frame(table(survey[[5]]), stringsAsFactors = FALSE)
 
-p_dedicato$Var1 <- ifelse(grepl("Si", ignore.case = T, p_dedicato$Var1), "Yes", p_dedicato$Var1)
+bb_personnel$Var1 <- ifelse(grepl("Si", ignore.case = T, bb_personnel$Var1), "Yes", bb_personnel$Var1)
 
-#frazione delle variabili nel donut
-p_dedicato$fraction = p_dedicato$Freq / sum(p_dedicato$Freq)
+## chart
 
-# top e bottom di ogni rettangolo per il donut
-p_dedicato$ymax = cumsum(p_dedicato$fraction)
-p_dedicato$ymin = c(0, head(p_dedicato$ymax, n=-1))
+bb_personnel$fraction = bb_personnel$Freq / sum(bb_personnel$Freq)
 
-# Compute label position
-p_dedicato$labelPosition <- (p_dedicato$ymax + p_dedicato$ymin) / 2
+bb_personnel$ymax = cumsum(bb_personnel$fraction)
+bb_personnel$ymin = c(0, head(bb_personnel$ymax, n=-1))
+
+bb_personnel$labelPosition <- (bb_personnel$ymax + bb_personnel$ymin) / 2
 
 # donut plot
 
-chart_personnel <- ggplot(p_dedicato, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Var1)) +
+chart_personnel <- ggplot(bb_personnel, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Var1)) +
   geom_rect() +
   geom_text(x= 3.5, aes(y=labelPosition, label = paste0("N = ", Freq, ",\n", round(fraction*100, digit = 1), "%")), size = 5, fontface = "bold") +
   coord_polar("y") +
@@ -63,13 +62,14 @@ chart_personnel <- ggplot(p_dedicato, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, 
   labs(title = "Presence of dedicated personnel") +
   guides(fill = guide_legend(title = "Answers")) +
   theme(
-    plot.title = element_text(face = "bold", size = 16, hjust = 0.5) )+
-  scale_fill_manual(values = mycolors)
+    plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+    text = element_text(family = "Arial"))+
+   scale_fill_manual(values = mycolors)
 
 
-# personnel activities ---------------------------
+# staff activities-------------------------------
 
-attiv <- survey[[6]] %>%
+activ <- survey[[6]] %>%
   na.omit() %>%
   strsplit(";") %>%
   unlist() %>%
@@ -77,17 +77,17 @@ attiv <- survey[[6]] %>%
   as.data.frame() 
 
 
-attiv$. <- str_replace(attiv$.,"Gestione dei campioni", "Samples handling")
-attiv$. <- str_replace(attiv$.,"Gestione dei dati associati ai campioni", "Specimen associated data management")
-attiv$. <- str_replace(attiv$.,"Gestione della qualità", "Quality management")
-attiv$. <- ifelse(grepl("Compliance", ignore.case = T, attiv$.), "Ethical-legal-social compliance (Informed consents, data protection, feedback results, access)", attiv$.)
+activ$. <- str_replace(activ$.,"Gestione dei campioni", "Samples handling")
+activ$. <- str_replace(activ$.,"Gestione dei dati associati ai campioni", "Specimen associated data management")
+activ$. <- str_replace(activ$.,"Gestione della qualità", "Quality management")
+activ$. <- ifelse(grepl("Compliance", ignore.case = T, activ$.), "Ethical-legal-social compliance (Informed consents, data protection, feedback results, access)", activ$.)
 
-attiv <-attiv[order(attiv$Freq, decreasing = T),]
-attiv$. <- factor(attiv$., levels = attiv$.)
+activ <-activ[order(activ$Freq, decreasing = T),]
+activ$. <- factor(activ$., levels = activ$.)
 
-# Barplot attività del personale
+# Barplot
 
-chart_personnel2 <- ggplot(attiv, aes(x = ., y = Freq, fill =.)) +
+chart_personnel2 <- ggplot(activ, aes(x = ., y = Freq, fill =.)) +
   geom_bar(stat = "identity", width = 0.5) +
   theme_minimal()+
   geom_text(aes(label = Freq), vjust = -0.5) +
@@ -100,33 +100,30 @@ chart_personnel2 <- ggplot(attiv, aes(x = ., y = Freq, fill =.)) +
         axis.text.x = element_text(size = 12),
         axis.text.y = element_text(size = 12),
         axis.line = element_line(colour = "black"),
-        panel.background = element_rect()) +
-  guides(fill = guide_legend(title = "Answers")) +
-  scale_fill_manual(values = mycolors) + 
+        panel.background = element_rect(),
+        text = element_text(family = "Arial")) +
+    guides(fill = guide_legend(title = "Answers")) +
+   scale_fill_manual(values = mycolors) + 
   scale_y_continuous(expand = expansion( mult = c(0, 0.1)))
+  
+# data annotation personnel --------------------------
 
-# data annotation personnel ------------------------------
+annot_pers <- as.data.frame(table(survey[[8]]))
 
-pers_annotazione <- as.data.frame(table(survey[[8]]))
+annot_pers$Var1 <- str_replace(annot_pers$Var1, "Si", "Yes")
+annot_pers$Var1 <- str_replace(annot_pers$Var1, "Non so", "Unsure")
 
-pers_annotazione$Var1 <- str_replace(pers_annotazione$Var1, "Si", "Yes")
-pers_annotazione$Var1 <- str_replace(pers_annotazione$Var1, "Non so", "Unsure")
+# donut setting
+annot_pers$fraction = annot_pers$Freq / sum(annot_pers$Freq)
 
+annot_pers$ymax = cumsum(annot_pers$fraction)
+annot_pers$ymin = c(0, head(annot_pers$ymax, n=-1))
 
-#frazione delle variabili nel donut
-pers_annotazione$fraction = pers_annotazione$Freq / sum(pers_annotazione$Freq)
-
-# top e bottom di ogni rettangolo per il donut
-pers_annotazione$ymax = cumsum(pers_annotazione$fraction)
-pers_annotazione$ymin = c(0, head(pers_annotazione$ymax, n=-1))
-
-# Compute label position
-pers_annotazione$labelPosition <- (pers_annotazione$ymax + pers_annotazione$ymin) / 2
-
+annot_pers$labelPosition <- (annot_pers$ymax + annot_pers$ymin) / 2
 
 # donut
 
-chart_personnel3 <- ggplot(pers_annotazione, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill= pers_annotazione$Var1)) +
+chart_personnel3 <- ggplot(annot_pers, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill= Var1)) +
   geom_rect() +
   coord_polar("y", start=0)+
   xlim(c(2, 4)) +
@@ -135,47 +132,13 @@ chart_personnel3 <- ggplot(pers_annotazione, aes(ymax=ymax, ymin=ymin, xmax=4, x
   guides(fill = guide_legend(title = "Answers")) +
   labs(title = "Staff with experience in data annotation \nand data modelling") +
   theme(
-    plot.title = element_text(face = "bold", size = 15, hjust = 0.5)
+    plot.title = element_text(face = "bold", size = 15, hjust = 0.5),
+    text = element_text(family = "Arial")
   ) +
   scale_fill_manual(values = mycolors)
 
 
-# staff composition -----------------------------------
-
-pers_annotazione <- as.data.frame(table(survey[[8]]))
-
-pers_annotazione$Var1 <- str_replace(pers_annotazione$Var1, "Si", "Yes")
-pers_annotazione$Var1 <- str_replace(pers_annotazione$Var1, "Non so", "Unsure")
-
-
-#frazione delle variabili nel donut
-pers_annotazione$fraction = pers_annotazione$Freq / sum(pers_annotazione$Freq)
-
-# top e bottom di ogni rettangolo per il donut
-pers_annotazione$ymax = cumsum(pers_annotazione$fraction)
-pers_annotazione$ymin = c(0, head(pers_annotazione$ymax, n=-1))
-
-# Compute label position
-pers_annotazione$labelPosition <- (pers_annotazione$ymax + pers_annotazione$ymin) / 2
-
-
-# donut
-
-chart_personnel3 <- ggplot(pers_annotazione, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill= pers_annotazione$Var1)) +
-  geom_rect() +
-  coord_polar("y", start=0)+
-  xlim(c(2, 4)) +
-  geom_text(x= 3.5, aes(y=labelPosition, label = paste0("N = ", Freq, ",\n", round(fraction*100, digit = 1), "%")),size = 5, fontface = "bold") +
-  theme_void() +
-  guides(fill = guide_legend(title = "Answers")) +
-  labs(title = "Staff with experience in data annotation \nand data modelling") +
-  theme(
-    plot.title = element_text(face = "bold", size = 15, hjust = 0.5)
-  ) +
-  scale_fill_manual(values = mycolors)
-
-
-# terminologies ---------------------------------
+# terminologies ---------------------------------------------------
 
 term <- survey[[9]] %>%
   na.omit() %>%
@@ -184,8 +147,8 @@ term <- survey[[9]] %>%
   as.data.frame()
 
 ans9 <- c("SNOMED CT","ICD-9","ICD-10","LOINC","OBIB","ATC")
-
-altre_term <- c()
+    
+other_term <- c()
 
 term$. <- str_remove_all(term$., "Terminologie: ")
 term$. <- str_remove_all(term$., "Ontologie: ")
@@ -195,12 +158,12 @@ term$. <- ifelse(grepl("atc", ignore.case = T, term$.), "ATC", term$.)
 for (r in term$.) {
   risp <- tolower(r)  
   if (!(risp %in% tolower(ans9))) {
-    altre_term <- c(altre_term, r)
+    other_term <- c(other_term, r)
   }
 }
 
-term<- as.data.frame(table(term), stringsAsFactors = FALSE)
-
+term <- as.data.frame(table(term), stringsAsFactors = FALSE)
+ 
 
 for (a in 1:length(term$.)) {
   
@@ -229,43 +192,42 @@ chart_term <- ggplot(term, aes(x = `term$.`, y = Somma_Frequenza, fill = `term$.
         axis.text.x = element_text(size = 12, angle = -30, hjust = 0.15, vjust = 0.4),
         axis.text.y = element_text(size = 12),
         axis.line = element_line(colour = "black"),
-        panel.background = element_rect()) +
+        panel.background = element_rect(),
+        text = element_text(family = "Arial")) +
   guides(fill = guide_legend(title = "")) +
-  scale_fill_manual(values = mycolors) + 
+   scale_fill_manual(values = mycolors) + 
   scale_y_continuous(expand = expansion( mult = c(0, 0.1)))
 
 
-# personale con esperienza in CDM ----------------------------------
+# common data model - personnel -------------------------------------
 
-esp_cdm <- as.data.frame(table(survey[[10]]))
+cdm_pers <- as.data.frame(table(survey[[10]]))
 
-esp_cdm$Var1 <- str_replace(esp_cdm$Var1, "Si", "Yes")
-esp_cdm$Var1 <- str_replace(esp_cdm$Var1, "Non so", "Unsure")
+cdm_pers$Var1 <- str_replace(cdm_pers$Var1, "Si", "Yes")
+cdm_pers$Var1 <- str_replace(cdm_pers$Var1, "Non so", "Unsure")
 
-#frazione delle variabili nel donut
-esp_cdm$fraction = esp_cdm$Freq / sum(esp_cdm$Freq)
+# donut setting
+cdm_pers$fraction = cdm_pers$Freq / sum(cdm_pers$Freq)
 
-# top e bottom di ogni rettangolo per il donut
-esp_cdm$ymax = cumsum(esp_cdm$fraction)
-esp_cdm$ymin = c(0, head(esp_cdm$ymax, n=-1))
+cdm_pers$ymax = cumsum(cdm_pers$fraction)
+cdm_pers$ymin = c(0, head(cdm_pers$ymax, n=-1))
 
-# Compute label position
-esp_cdm$labelPosition <- (esp_cdm$ymax + esp_cdm$ymin) / 2
-
-
+cdm_pers$labelPosition <- (cdm_pers$ymax + cdm_pers$ymin) / 2
+ 
 # donut
 
-chart_personnel4 <- ggplot(esp_cdm,  aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=esp_cdm[[1]])) +
+chart_personnel4 <- ggplot(cdm_pers,  aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Var1)) +
   geom_rect() +
   xlim(c(2, 4)) +
   coord_polar("y", start=0)+
   geom_text(x= 3.5, aes(y=labelPosition, label = paste0("N = ", Freq, ",\n", round(fraction*100, digit = 1), "%")), size = 5, fontface = "bold") +
   theme_void()+
-  labs(title = "Is the Biobank staff proficient in Common Data Models?", x = "", y = "", ) +
+  labs(title = "Do the Biobank staff have expertise in Common Data Models?", x = "", y = "", ) +
   theme(legend.position = "right",
         legend.direction = "vertical",
-        plot.title = element_text(face = "bold", size = 16, hjust = 0.5)
-  ) +
+        plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+        text = element_text(family = "Arial")
+        ) +
   guides(fill = guide_legend(title = "Answers")) + 
   scale_fill_manual(values = mycolors)
 
@@ -280,15 +242,15 @@ cdm <- survey[[11]] %>%
 
 cdm$. <- ifelse(grepl("omop", cdm$., ignore.case = T), "OMOP", cdm$. )
 cdm$. <- ifelse(grepl("hir", cdm$.,  ignore.case = T), "FHIR", cdm$. )
-
+  
 other_CDM <- c()
 
 for (cdmodel in 1:length(cdm$.)) {
   if(cdm$.[cdmodel] %in% c("OMOP", "FHIR"))  {
-    cdmodel <- cdmodel 
+  cdmodel <- cdmodel 
   } else {
-    other_CDM <- c(other_CDM, cdm$.[cdmodel])
-    cdm$.[cdmodel] <- "Some other"
+  other_CDM <- c(other_CDM, cdm$.[cdmodel])
+  cdm$.[cdmodel] <- "Some other"
   }
 }  
 
@@ -296,7 +258,7 @@ cdm <- as.data.frame(table(cdm))
 
 cdm$.<- factor(cdm$., levels = cdm$.)
 
-# barplot cdm usati
+# barplot 
 
 chart_cdm <-ggplot(cdm, aes(x = ., y = Freq, fill = .)) +
   geom_bar(stat = "identity", width = 0.5) +
@@ -307,32 +269,30 @@ chart_cdm <-ggplot(cdm, aes(x = ., y = Freq, fill = .)) +
         axis.text.x = element_text(size = 12, angle = -30, hjust = 0.15, vjust = 0.4),
         axis.text.y = element_text(size = 12),
         axis.line = element_line(colour = "black"),
-        panel.background = element_rect()) +
+        panel.background = element_rect(),
+        text = element_text(family = "Arial")) +
   geom_text(aes(label = Freq),vjust = -0.5) +
   labs(title = "Adopted Common Data Models", x = "Answers", y = "N Biobanks") +
   guides(fill = guide_legend(title = "CDM"))+
-  scale_fill_manual(values = mycolors) + 
+   scale_fill_manual(values = mycolors) + 
   scale_y_continuous(expand = expansion( mult = c(0, 0.1)))
 
 
-# personnel FHIR expert -----------------------------------
+# HL7 FHIR - personnel ----------------------------------------
 
 fhir <- as.data.frame(table(survey[[12]]))
 
-#frazione delle variabili nel donut
+# donut setting
 fhir$fraction = fhir$Freq / sum(fhir$Freq)
 
-# top e bottom di ogni rettangolo per il donut
 fhir$ymax = cumsum(fhir$fraction)
 fhir$ymin = c(0, head(fhir$ymax, n=-1))
 
-# Compute label position
 fhir$labelPosition <- (fhir$ymax + fhir$ymin) / 2
-
-
+ 
 # donut 
 
-chart_personnel5 <- ggplot(fhir, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill = fhir[[1]])) +
+chart_personnel5 <- ggplot(fhir, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill = Var1)) +
   geom_rect() +
   xlim(c(2, 4)) +
   geom_text(x= 3.5, aes(y=labelPosition, label = paste0("N = ", Freq, ",\n", round(fraction*100, digit = 1), "%")), size = 5, fontface = "bold") +
@@ -341,27 +301,27 @@ chart_personnel5 <- ggplot(fhir, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill 
   labs(title = "Does the staff have experience with HL7 FHIR?", x = "", y = "", ) +
   theme(legend.position = "right",
         legend.direction = "vertical",
-        plot.title = element_text(face = "bold", size = 16, hjust = 0.5)
-  ) +
+        plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+        text = element_text(family = "Arial")
+        ) +
   guides(fill = guide_legend(title = "Answers")) +
-  scale_fill_manual(values = mycolors)
+   scale_fill_manual(values = mycolors)
 
-# bims --------------------------------------
+
+# database ----------------------------------------
 
 lim <- as.data.frame(table(survey[[13]]))
 
 lim$Var1 <- str_replace(lim$Var1, "Si", "Yes")
 
-#frazione delle variabili nel donut
+# donut setting
 lim$fraction = lim$Freq / sum(lim$Freq)
 
-# top e bottom di ogni rettangolo per il donut
 lim$ymax = cumsum(lim$fraction)
 lim$ymin = c(0, head(lim$ymax, n=-1))
 
-# Compute label position
 lim$labelPosition <- (lim$ymax + lim$ymin) / 2
-
+ 
 # piechart 
 
 chart_lims <- ggplot(lim, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Var1)) +
@@ -374,17 +334,17 @@ chart_lims <- ggplot(lim, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Var1)) 
   to the data associated with the biological samples in the Biobank?", x = "", y = "", ) +
   theme(legend.position = "right",
         legend.direction = "vertical",
-        plot.title = element_text(face = "bold", size = 12, hjust = 0.5)
-  ) +
+        plot.title = element_text(face = "bold", size = 12, hjust = 0.5),
+        text = element_text(family = "Arial")
+        ) +
   guides(fill = guide_legend(title = "Answers")) +
-  scale_fill_manual(values = mycolors)
+   scale_fill_manual(values = mycolors)
 
 
 # bims2 -------------------------------------------
 
 sist <- survey[[14]] %>%
   na.omit() %>%
-  strsplit(";|- ") %>%
   unlist() %>%
   as.data.frame()
 
@@ -394,7 +354,7 @@ NOlims <- c()
 
 for(n in sist$.) {
 
-  if (n == "NOBIMS") {
+  if (startsWith(n, "S")) {
     NOlims <- append(NOlims, n)
   } else {
     lims <- append(lims, n)
@@ -439,7 +399,8 @@ chart_lims2 <- ggplot(lims, aes(x = lims, y = Freq, fill = lims)) +
   scale_fill_manual(values = mycolors) + 
   scale_y_continuous(expand = expansion( mult = c(0, 0.1)))
 
-# clinical data ----------------------------------------
+
+# clinical data - it system -----------------------------------
 
 link <- survey[[15]] %>%
   tolower() %>%
@@ -469,14 +430,15 @@ chart_clindata <- ggplot(link, aes(x = ., y = Freq, fill = .)) +
         axis.text.x = element_text(size = 12),
         axis.text.y = element_text(size = 12),
         axis.line = element_line(colour = "black"),
-        panel.background = element_rect()) +
-  guides(fill = guide_legend(title = "Answers")) +
-  scale_fill_manual(values = mycolors) + 
+        panel.background = element_rect(),
+        text = element_text(family = "Arial")) +
+    guides(fill = guide_legend(title = "Answers")) +
+   scale_fill_manual(values = mycolors) + 
   scale_y_continuous(expand = expansion( mult = c(0, 0.1)))
 
 
 
-# storage without lims ----------------------------
+# data storage without db --------------------------------------
 
 nosist <- survey[[16]] %>%
   na.omit %>%
@@ -491,14 +453,12 @@ nosist[2,1] <- "Database or LIMS from another departement (e.g. anatomical patho
 
 nosist <-as.data.frame(table(nosist))
 
-#frazione delle variabili nel donut
+# donut setting
 nosist$fraction = nosist$Freq / sum(nosist$Freq)
 
-# top e bottom di ogni rettangolo per il donut
 nosist$ymax = cumsum(nosist$fraction)
 nosist$ymin = c(0, head(nosist$ymax, n=-1))
 
-# Compute label position
 nosist$labelPosition <- (nosist$ymax + nosist$ymin) / 2
 
 # donutchart 
@@ -513,30 +473,28 @@ chart_nosist <- ggplot(nosist, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=.)
        a dedicated IT system?", x = "", y = "", ) +
   theme(legend.position = "bottom",
         legend.direction = "vertical",
-        plot.title = element_text(face = "bold", size = 16, hjust = 0.5)
-  ) +
+        plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+        text = element_text(family = "Arial")
+        ) +
   guides(fill = guide_legend(title = "Answers")) +
-  scale_fill_manual(values = mycolors)
+   scale_fill_manual(values = mycolors)
 
-
-# bb data infrastructure ---------------------------------------------------
+# infrastructure - data -------------------------------------------
 
 inf <- as.data.frame(table(survey[[17]]))
 
 inf$Var1 <- str_replace(inf$Var1, "Si", "Yes")
 inf$Var1 <- str_replace(inf$Var1, "Non so", "Unsure")
 
-#frazione delle variabili nel donut
+# donut setting
 inf$fraction = inf$Freq / sum(inf$Freq)
 
-# top e bottom di ogni rettangolo per il donut
 inf$ymax = cumsum(inf$fraction)
 inf$ymin = c(0, head(inf$ymax, n=-1))
 
-# Compute label position
 inf$labelPosition <- (inf$ymax + inf$ymin) / 2
 
-# donut se presente infrastruttura
+# donut
 
 chart_infrstr <- ggplot(inf, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Var1)) +
   geom_rect() +
@@ -544,35 +502,36 @@ chart_infrstr <- ggplot(inf, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Var1
   geom_text(x= 3.5, aes(y=labelPosition, label = paste0("N = ", Freq, ",\n", round(fraction*100, digit = 1), "%")), size = 5, fontface = "bold") +
   coord_polar("y", start=0)+
   theme_void()+
-  labs(title = "Does the institution have access to an IT infrastructure dedicated to the data \nand/or data processing associated with the biobanked biological sample?", x = "", y = "", ) +
+  labs(title = "Does the institution have access to an IT infrastructure dedicated to the data \nor data processing associated with the biobanked sample?", x = "", y = "", ) +
   theme(legend.position = "right",
         legend.direction = "vertical",
-        plot.title = element_text(face = "bold", size = 14, hjust = 0.5)
-  ) +
-  guides(fill = guide_legend(title = "Answers")) +
-  scale_fill_manual(values = mycolors)
+        plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+        text = element_text(family = "Arial")
+        ) +
+    guides(fill = guide_legend(title = "Answers")) +
+   scale_fill_manual(values = mycolors)
+
 
 # IT infrastructure management -------------------------------
 
 risp18 <- c("dal personale della biobanca","da un gruppo dedicato afferente all'istituto (e.g., il Centro Elaborazione Dati)", "fornitore esterno, non-commerciale (e.g., CINECA, INFN)",  "fornitore esterno, commerciale (e.g., AWS, Azure, etc.)")
 
-gestione <- survey[[18]] %>%
+infr_manag <- survey[[18]] %>%
   na.omit 
-gestione<- ifelse(!(gestione %in% risp18), "Some other", gestione) 
+infr_manag<- ifelse(!(infr_manag %in% risp18), "Some other", infr_manag) 
 
-gestione <- as.data.frame(table(gestione))
+infr_manag <- as.data.frame(table(infr_manag))
 
-gestione$gestione <- str_replace(gestione$gestione, "dal personale della biobanca", "By Biobank staff")
-gestione$gestione <- ifelse(grepl("gruppo dedicato afferente", gestione$gestione), "By dedicated staff relating to the institute (e.g. Data Processing Center)", gestione$gestione)
-gestione$gestione <- ifelse(grepl("fornitore esterno, non-commerciale", gestione$gestione), "Non-bussiness third-party provider (e.g., CINECA, INFN)", gestione$gestione)
-gestione$gestione <- ifelse(grepl("fornitore esterno, commerciale ", gestione$gestione), "Bussiness third-party provider (e.g., AWS, Azure, etc.)", gestione$gestione)
+infr_manag$infr_manag <- str_replace(infr_manag$infr_manag, "dal personale della biobanca", "By Biobank staff")
+infr_manag$infr_manag <- ifelse(grepl("gruppo dedicato afferente", infr_manag$infr_manag), "By dedicated staff relating to the institute (e.g. Data Processing Center)", infr_manag$infr_manag)
+infr_manag$infr_manag <- ifelse(grepl("fornitore esterno, non-commerciale", infr_manag$infr_manag), "Non-bussiness third-party provider (e.g., CINECA, INFN)", infr_manag$infr_manag)
+infr_manag$infr_manag <- ifelse(grepl("fornitore esterno, commerciale ", infr_manag$infr_manag), "Bussiness third-party provider (e.g., AWS, Azure, etc.)", infr_manag$infr_manag)
 
-gestione$gestione <- factor(gestione$gestione, levels = gestione$gestione)
-
+infr_manag$infr_manag <- factor(infr_manag$infr_manag, levels = infr_manag$infr_manag)
 
 # barplot 
 
-chart_infrstr2 <- ggplot(gestione, aes(x = gestione, y = Freq, fill =gestione)) +
+chart_infrstr2 <- ggplot(infr_manag, aes(x = infr_manag, y = Freq, fill =infr_manag)) +
   geom_bar(stat = "identity", width = 0.5) +
   theme_minimal()+
   geom_text(aes(label = Freq),vjust = -0.5) +
@@ -585,9 +544,10 @@ chart_infrstr2 <- ggplot(gestione, aes(x = gestione, y = Freq, fill =gestione)) 
         axis.text.x = element_text(size = 12),
         axis.text.y = element_text(size = 12),
         axis.line = element_line(colour = "black"),
-        panel.background = element_rect()) +
-  guides(fill = guide_legend(title = "Ansewrs")) +
-  scale_fill_manual(values = mycolors) + 
+        panel.background = element_rect(),
+        text = element_text(family = "Arial")) +
+  guides(fill = guide_legend(title = "Answers")) +
+   scale_fill_manual(values = mycolors) + 
   scale_y_continuous(expand = expansion( mult = c(0, 0.1)))
 
 # storage ----------------------------------------------
@@ -597,17 +557,15 @@ storage <- as.data.frame(table(survey[[19]]))
 storage$Var1 <- str_replace(storage$Var1, "Si", "Yes")
 storage$Var1 <- str_replace(storage$Var1, "Non so", "Unsure")
 
-#frazione delle variabili nel donut
+# donut setting
 storage$fraction = storage$Freq / sum(storage$Freq)
 
-# top e bottom di ogni rettangolo per il donut
 storage$ymax = cumsum(storage$fraction)
 storage$ymin = c(0, head(storage$ymax, n=-1))
 
-# Compute label position
 storage$labelPosition <- (storage$ymax + storage$ymin) / 2
-
-# donut sotrage massivo
+ 
+# donut
 
 chart_storage <- ggplot(storage, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Var1)) +
   geom_rect() +
@@ -618,50 +576,50 @@ chart_storage <- ggplot(storage, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=
   labs(title = "Availability of a massive storage system", x = "", y = "", ) +
   theme(legend.position = "right",
         legend.direction = "vertical",
-        plot.title = element_text(face = "bold", size = 16, hjust = 0.5)
-  ) +
-  guides(fill = guide_legend(title = "Answers")) +
-  scale_fill_manual(values = mycolors)
+        plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+        text = element_text(family = "Arial")
+        ) +
+    guides(fill = guide_legend(title = "Answers")) +
+   scale_fill_manual(values = mycolors)
 
 
 # federated search ------------------------------------
 
-ric_fed <- as.data.frame(table(survey[[20]]))
+fed_s <- as.data.frame(table(survey[[20]]))
 
-ric_fed$Var1 <- str_replace(ric_fed$Var1, "Si", "Yes")
+fed_s$Var1 <- str_replace(fed_s$Var1, "Si", "Yes")
 
-#frazione delle variabili nel donut
-ric_fed$fraction = ric_fed$Freq / sum(ric_fed$Freq)
+# donut setting
+fed_s$fraction = fed_s$Freq / sum(fed_s$Freq)
 
-# top e bottom di ogni rettangolo per il donut
-ric_fed$ymax = cumsum(ric_fed$fraction)
-ric_fed$ymin = c(0, head(ric_fed$ymax, n=-1))
+fed_s$ymax = cumsum(fed_s$fraction)
+fed_s$ymin = c(0, head(fed_s$ymax, n=-1))
 
-# Compute label position
-ric_fed$labelPosition <- (ric_fed$ymax + ric_fed$ymin) / 2
-
+fed_s$labelPosition <- (fed_s$ymax + fed_s$ymin) / 2
+ 
 # donut
 
-chart_fed_search <- ggplot(ric_fed, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Var1)) +
+chart_fed_search <- ggplot(fed_s, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Var1)) +
   geom_rect() +
   xlim(c(2, 4)) +
   geom_text(x= 3.5, aes(y=labelPosition, label = paste0("N = ", Freq, ",\n", round(fraction*100, digit = 1), "%")), size = 5, fontface = "bold") +
   coord_polar("y", start=0)+
   theme_void()+
   labs(title = "Can the Biobank, indipendently or by the IT departement, 
-       allocate computational resources for Federated Search service?", x = "", y = "", ) +
+       allocate computational resources for Federated Search services?", x = "", y = "", ) +
   theme(legend.position = "right",
         legend.direction = "vertical",
         plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
-        plot.subtitle = element_text(size = 12, hjust = 0.5)
-  ) +
-  guides(fill = guide_legend(title = "Answers", reverse = T)) +
-  scale_fill_manual(values = mycolors)
+        plot.subtitle = element_text(size = 12, hjust = 0.5),
+        text = element_text(family = "Arial")
+        ) +
+    guides(fill = guide_legend(title = "Answers", reverse = T)) +
+   scale_fill_manual(values = mycolors)
 
 
 # federated search resoures ----------------------------------
 
-risorse_fed <- survey[[21]] %>%
+fed_res <- survey[[21]] %>%
   na.omit() %>%
   strsplit(";") %>%
   unlist() %>%
@@ -670,26 +628,25 @@ risorse_fed <- survey[[21]] %>%
 
 risp21 <- c("macchina virtuale","software containers","computer fisico dedicato")
 
-
-for (a in 1:length(risorse_fed$.)) {
+for (a in 1:length(fed_res$.)) {
   
-  ifelse(!(risorse_fed$.[a] %in% risp21),risorse_fed$.[a] <-"Some other", risorse_fed$.)
+  ifelse(!(fed_res$.[a] %in% risp21),fed_res$.[a] <-"Some other", fed_res$.)
   
 }
 
-risorse_fed <- risorse_fed %>%
-  group_by(risorse_fed$.) %>%
+fed_res <- fed_res %>%
+  group_by(fed_res$.) %>%
   summarize(Freq = sum(Freq)) %>%
   move2last(1) 
 
-risorse_fed <- risorse_fed[order(risorse_fed$Freq, decreasing = T),]
-risorse_fed$`risorse_fed$.` <- str_replace(risorse_fed$`risorse_fed$.`, "macchina virtuale", "Virtual machine")
-risorse_fed$`risorse_fed$.` <- str_replace(risorse_fed$`risorse_fed$.`, "computer fisico dedicato", "Physical dedicated computer")
-risorse_fed$`risorse_fed$.` <-  factor(risorse_fed$`risorse_fed$.` , levels = risorse_fed$`risorse_fed$.`)
+fed_res <- fed_res[order(fed_res$Freq, decreasing = T),]
+fed_res$`fed_res$.` <- str_replace(fed_res$`fed_res$.`, "macchina virtuale", "Virtual machine")
+fed_res$`fed_res$.` <- str_replace(fed_res$`fed_res$.`, "computer fisico dedicato", "Physical dedicated computer")
+fed_res$`fed_res$.` <-  factor(fed_res$`fed_res$.` , levels = fed_res$`fed_res$.`)
 
-# barplot risorse per allocazione dati
+# barplot 
 
-chart_fed_search2 <- ggplot(risorse_fed, aes(x = `risorse_fed$.`, y = Freq, fill = `risorse_fed$.`)) +
+chart_fed_search2 <- ggplot(fed_res, aes(x = `fed_res$.`, y = Freq, fill = `fed_res$.`)) +
   geom_bar(stat = "identity", width = 0.5, color = "transparent") +
   theme_minimal() +
   geom_text(aes(label = Freq),vjust = -0.5) +
@@ -702,8 +659,9 @@ chart_fed_search2 <- ggplot(risorse_fed, aes(x = `risorse_fed$.`, y = Freq, fill
         axis.line = element_line(colour = "black"),
         panel.background = element_rect()) +
   guides(fill = guide_legend(title = "")) +
-  scale_fill_manual(values = mycolors) + 
+   scale_fill_manual(values = mycolors) + 
   scale_y_continuous(expand = expansion( mult = c(0, 0.1)))
+
 
 # dwh ----------------------------------------------
 
@@ -712,17 +670,15 @@ dwh <- as.data.frame(table(survey[[22]]))
 dwh$Var1 <- str_replace(dwh$Var1, "Si", "Yes")
 dwh$Var1 <- str_replace(dwh$Var1, "Non so", "Unsure")
 
-#frazione delle variabili nel donut
+# donut setting
 dwh$fraction = dwh$Freq / sum(dwh$Freq)
 
-# top e bottom di ogni rettangolo per il donut
 dwh$ymax = cumsum(dwh$fraction)
 dwh$ymin = c(0, head(dwh$ymax, n=-1))
 
-# Compute label position
 dwh$labelPosition <- (dwh$ymax + dwh$ymin) / 2
-
-# donut collettore dati
+ 
+# donut
 
 chart_dwh <- ggplot(dwh, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Var1)) +
   geom_rect() +
@@ -733,13 +689,14 @@ chart_dwh <- ggplot(dwh, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Var1)) +
   labs(title = "Data Warehouse or Data Lake presence", x = "", y = "", ) +
   theme(legend.position = "right",
         legend.direction = "vertical",
-        plot.title = element_text(face = "bold", size = 16, hjust = 0.5)
-  ) +
-  guides(fill = guide_legend(title = "Answers")) +
-  scale_fill_manual(values = mycolors)
+        plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+        text = element_text(family = "Arial")
+        ) +
+    guides(fill = guide_legend(title = "Answers")) +
+   scale_fill_manual(values = mycolors)
 
 
-# dwh location ------------------------------------
+# data storage infrastructure ------------------------------------------
 
 str_dwh <- survey[[23]] %>%
   na.omit() %>%
@@ -752,7 +709,7 @@ str_dwh$. <- str_replace(str_dwh$., "su cloud", "Cloud")
 str_dwh <- str_dwh[order(str_dwh$Freq, decreasing = T),]
 str_dwh$.<- factor(str_dwh$., levels = str_dwh$.)
 
-# barplot struttura
+# barplot
 
 chart_dwh2 <- ggplot(str_dwh, aes(x = ., y = Freq, fill = .)) +
   geom_bar(stat = "identity", width = 0.5, color = "transparent") +
@@ -765,69 +722,70 @@ chart_dwh2 <- ggplot(str_dwh, aes(x = ., y = Freq, fill = .)) +
         axis.text.x = element_text(size = 12, angle = -20, hjust = 0.1, vjust = 0.4),
         axis.text.y = element_text(size = 12),
         axis.line = element_line(colour = "black"),
-        panel.background = element_rect()) +
+        panel.background = element_rect(),
+        text = element_text(family = "Arial")) +
   guides(fill = guide_legend(title = "")) +
-  scale_fill_manual(values = mycolors) + 
+   scale_fill_manual(values = mycolors) + 
+  scale_y_continuous(expand = expansion( mult = c(0, 0.1)))
+
+ 
+# ngs lab -------------------------------
+data storage infrastructure ------------------------------------------
+
+str_dwh <- survey[[23]] %>%
+  na.omit() %>%
+  table() %>%
+  as.data.frame()
+
+str_dwh$. <- str_replace(str_dwh$., "in sistemi fisici dell'istituto", "Institute's physical system")
+str_dwh$. <- str_replace(str_dwh$., "su cloud", "Cloud")
+
+str_dwh <- str_dwh[order(str_dwh$Freq, decreasing = T),]
+str_dwh$.<- factor(str_dwh$., levels = str_dwh$.)
+
+# barplot
+
+chart_dwh2 <- ggplot(str_dwh, aes(x = ., y = Freq, fill = .)) +
+  geom_bar(stat = "identity", width = 0.5, color = "transparent") +
+  theme_minimal()+
+  geom_text(aes(label = Freq),vjust = -0.5) +
+  labs(title = "Where is the infrastructure for data storage located?", x = "Answer", y = "N Biobanks") +
+  theme(legend.position = "none",
+        plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+        axis.title = element_text(size = 12),
+        axis.text.x = element_text(size = 12, angle = -20, hjust = 0.1, vjust = 0.4),
+        axis.text.y = element_text(size = 12),
+        axis.line = element_line(colour = "black"),
+        panel.background = element_rect(),
+        text = element_text(family = "Arial")) +
+  guides(fill = guide_legend(title = "")) +
+   scale_fill_manual(values = mycolors) + 
   scale_y_continuous(expand = expansion( mult = c(0, 0.1)))
 
 
-# 
-# ngs lab -------------------------------
-
-ngs <- as.data.frame(table(survey[[24]]))
-
-ngs$Var1 <- str_replace(ngs$Var1, "Si", "Yes")
-ngs$Var1 <- str_replace(ngs$Var1, "Non so", "Unsure")
-
-#frazione delle variabili nel donut
-ngs$fraction = ngs$Freq / sum(ngs$Freq)
-
-# top e bottom di ogni rettangolo per il donut
-ngs$ymax = cumsum(ngs$fraction)
-ngs$ymin = c(0, head(ngs$ymax, n=-1))
-
-# Compute label position
-ngs$labelPosition <- (ngs$ymax + ngs$ymin) / 2
-
-# donut accesso a ngs
-
-chart_ngs <- ggplot(ngs, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Var1)) +
-  geom_rect() +
-  xlim(c(2, 4)) +
-  geom_text(x= 3.5, aes(y=labelPosition, label = paste0("N = ", Freq, ",\n", round(fraction*100, digit = 1), "%")), size = 5, fontface = "bold") +
-  coord_polar("y", start=0)+
-  theme_void()+
-  labs(title = "Accessibility to NGS laboratory", x = "", y = "", ) +
-  theme(legend.position = "right",
-        legend.direction = "vertical",
-        plot.title = element_text(face = "bold", size = 16, hjust = 0.5)
-  ) +
-  guides(fill = guide_legend(title = "Answers")) +
-  scale_fill_manual(values = mycolors)
-
-
 # ngs tech --------------------------------------
+ngs technology -----------------------------------------------
 
-tipo_ngs <- survey[[25]] %>%
+ngs_tech <- survey[[25]] %>%
   na.omit() %>%
   strsplit(";") %>%
   unlist() 
 
 risp25 <- c ("Illumina","Thermo Fisher","Oxford Nanopore")
-tipo_ngs <- ifelse(!(tipo_ngs %in% risp25), "Other technologies", tipo_ngs)
+ngs_tech <- ifelse(!(ngs_tech %in% risp25), "Other technologies", ngs_tech)
 
-tipo_ngs <- tipo_ngs %>% 
+ngs_tech <- ngs_tech %>% 
   table() %>%
   as.data.frame() %>%
   move2last(1)
 
-tipo_ngs <- tipo_ngs[order(tipo_ngs$Freq, decreasing = T), ]
-tipo_ngs$. <- factor(tipo_ngs$., levels = tipo_ngs$.)
+ngs_tech <- ngs_tech[order(ngs_tech$Freq, decreasing = T), ]
+ngs_tech$. <- factor(ngs_tech$., levels = ngs_tech$.)
 
 
-# barplot tecnologie
+# barplot
 
-chart_ngs_tec <- ggplot(tipo_ngs, aes(x = ., y = Freq, fill = .)) +
+chart_ngs_tec <- ggplot(ngs_tech, aes(x = ., y = Freq, fill = .)) +
   geom_bar(stat = "identity", width = 0.5, color = "transparent") +
   theme_minimal()+
   geom_text(aes(label = Freq),vjust = -0.5) +
@@ -838,45 +796,49 @@ chart_ngs_tec <- ggplot(tipo_ngs, aes(x = ., y = Freq, fill = .)) +
         axis.text.x = element_text(size = 12, angle = -20, hjust = 0.4, vjust = 0.4),
         axis.text.y = element_text(size = 12),
         axis.line = element_line(colour = "black"),
-        panel.background = element_rect()) +
-  scale_fill_manual(values = mycolors) + 
+        panel.background = element_rect(),
+        text = element_text(family = "Arial")) +
+   scale_fill_manual(values = mycolors) + 
   scale_y_continuous(expand = expansion( mult = c(0, 0.1)))
 
 
-# omics --------------------------------------
+# omics platform ---------------------------------------------
 
-omiche <- survey[[26]] %>%
+omics <- survey[[26]] %>%
   na.omit() %>%
-  strsplit(";|,") %>%
+  strsplit(";|,| e ") %>%
   unlist() %>%
   as.data.frame()
 
-altre_omiche <- c()
+omics <- omics %>%
+  filter(!if_any(everything(), ~ . %in% c("no", "No", "NA") ))
 
-for (omica in 1:length(omiche$.)) {
-  if(omiche$.[omica] %in% c("Proteomica","Metabolomica","Genomica"))  {
-    omica <- omica 
+omics$. <-  ifelse(grepl("Proteomica", omics$., ignore.case = T), "Proteomics", omics$.)
+omics$. <-  ifelse(grepl("Metabolomica", omics$., ignore.case = T), "Metabolomics", omics$.)
+omics$. <-  ifelse(grepl("Genomica", omics$., ignore.case = T), "Genomics", omics$.)
+omics$. <-  ifelse(grepl("multiplex spatial", omics$., ignore.case = T), "Multiplex Spatial Profiling", omics$.)
+omics$. <-  ifelse(grepl("radiomica", omics$., ignore.case = T), "Radiomics", omics$.)
+omics$. <-  ifelse(grepl("trascrittomica", omics$., ignore.case = T), "Transcriptomics", omics$.)
+
+for (om in 1:length(omics$.)) {
+  if(omics$.[om] %in% c("Proteomics","Metabolomics","Genomics", "Transcriptomics", "Multiplex Spatial Profiling", "Transcriptomics", "Radiomics"))  {
+  om <- om 
   } else {
-    altre_omiche <- c(altre_omiche, omiche$.[omica])
-    omiche$.[omica] <- "Some other"
+  omics$.[om] <- "Some other"
   }
 }  
 
 
-omiche <- table(omiche) %>%
-  as.data.frame() %>%
-  move2last(1)
+omics <- table(omics) %>%
+  as.data.frame()
 
-omiche$. <- str_replace(omiche$., "Proteomica", "Proteomics")
-omiche$. <- str_replace(omiche$., "Metabolomica", "Metabolomics")
-omiche$. <- str_replace(omiche$., "Genomica", "Genomics")
-omiche <- omiche[order(omiche$Freq, decreasing = T),]
+omics <- omics[order(omics$Freq, decreasing = T),]
+omics <- omics %>% move2last(4)
+omics$. <-  factor(omics$., levels = omics$.)
 
-omiche$. <-  factor(omiche$., levels = omiche$.)
+# barplot 
 
-# barplot omiche
-
-chart_omics <- ggplot(omiche, aes(x = ., y = Freq, fill = .)) +
+chart_omics <- ggplot(omics, aes(x = ., y = Freq, fill = .)) +
   geom_bar(stat = "identity", width = 0.5, color = "transparent") +
   theme_minimal()+
   geom_text(aes(label = Freq),vjust = -0.5) +
@@ -884,11 +846,12 @@ chart_omics <- ggplot(omiche, aes(x = ., y = Freq, fill = .)) +
   theme(legend.position = "none",
         plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
         axis.title = element_text(size = 12),
-        axis.text.x = element_text(size = 12, angle = -20, hjust = 0.4, vjust = 0.4),
+        axis.text.x = element_text(size = 12, angle = -20, hjust = 0.1, vjust = 0.4),
         axis.text.y = element_text(size = 12),
         axis.line = element_line(colour = "black"),
-        panel.background = element_rect()) +
-  scale_fill_manual(values = mycolors) + 
+        panel.background = element_rect(),
+        text = element_text(family = "Arial")) +
+   scale_fill_manual(values = mycolors) + 
   scale_y_continuous(expand = expansion( mult = c(0, 0.1)))
 
 
@@ -899,17 +862,15 @@ lab_spec <- as.data.frame(table(survey[[27]]))
 lab_spec$Var1 <- str_replace(lab_spec$Var1, "Si", "Yes")
 lab_spec$Var1 <- str_replace(lab_spec$Var1, "Non so", "Unsure")
 
-#frazione delle variabili nel donut
+# donut setting
 lab_spec$fraction = lab_spec$Freq / sum(lab_spec$Freq)
 
-# top e bottom di ogni rettangolo per il donut
 lab_spec$ymax = cumsum(lab_spec$fraction)
 lab_spec$ymin = c(0, head(lab_spec$ymax, n=-1))
 
-# Compute label position
 lab_spec$labelPosition <- (lab_spec$ymax + lab_spec$ymin) / 2
-
-# piechart altri lab specializzati
+ 
+# piechart
 
 chart_lab <- ggplot(lab_spec, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Var1)) +
   geom_rect() +
@@ -920,10 +881,11 @@ chart_lab <- ggplot(lab_spec, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Var
   labs(title = "Accesibility to other specialized laboratory", x = "", y = "", ) +
   theme(legend.position = "right",
         legend.direction = "vertical",
-        plot.title = element_text(face = "bold", size = 16, hjust = 0.5)
-  ) +
-  guides(fill = guide_legend(title = "Answers")) +
-  scale_fill_manual(values = mycolors)
+        plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+        text = element_text(family = "Arial")
+        ) +
+    guides(fill = guide_legend(title = "Answers")) +
+   scale_fill_manual(values = mycolors)
 
 
 # lab specialization --------------------------------------
@@ -936,14 +898,14 @@ lab$. <- ifelse(grepl("patologica", lab$., ignore.case = T), "Pathological anato
 lab$. <- ifelse(grepl("pathology", lab$., ignore.case = T), "Digital Pathology", lab$.)
 lab <- as.data.frame(table(lab),stringsAsFactors = F)
 
-altri_lab <- c()
+other_lab <- c()
 
 for (labspec in 1:length(lab$.)) {
   if(lab$.[labspec] %in% c("Pathological anatomy","Digital Pathology"))  {
-    labspec <- labspec
+  labspec <- labspec
   } else {
-    altri_lab <- c(altri_lab, lab$.[labspec])
-    lab$.[labspec] <- "Some other"
+  other_lab <- c(other_lab, lab$.[labspec])
+  lab$.[labspec] <- "Some other"
   }
 }  
 
@@ -952,9 +914,10 @@ lab <- lab %>%
   summarize(Freq = sum(Freq))
 
 lab <- lab[order(lab$`lab$.`, decreasing = T),]
+lab <- move2last(lab, 1)
 lab$`lab$.` <- factor(lab$`lab$.`, levels = lab$`lab$.`)
 
-# barplot altri laboratori specializzati 
+# barplot
 
 chart_lab2 <- ggplot(lab, aes(x = `lab$.`, y = Freq, fill = `lab$.`)) +
   geom_bar(stat = "identity", width = 0.5, color = "transparent") +
@@ -967,121 +930,84 @@ chart_lab2 <- ggplot(lab, aes(x = `lab$.`, y = Freq, fill = `lab$.`)) +
         axis.text.x = element_text(size = 12, angle = -15, hjust = 0.4, vjust = 0.4),
         axis.text.y = element_text(size = 12),
         axis.line = element_line(colour = "black"),
-        panel.background = element_rect()) +
-  scale_fill_manual(values = mycolors) + 
+        panel.background = element_rect(),
+        text = element_text(family = "Arial")) +
+   scale_fill_manual(values = mycolors) + 
   scale_y_continuous(expand = expansion( mult = c(0, 0.1)))
 
 
 # data specialization ------------------------------------------
 
-dati <- survey[[29]] %>%
+data_sp <- survey[[29]] %>%
   strsplit(";|,") %>%
   unlist() %>%
   as.data.frame() 
 
 risp29 <- c("malattie rare","oncologia","metagenomica batterica","metagenomica virale")
-
-for (a in 1:length(dati$.)) {
   
-  ifelse(!(dati$.[a] %in% risp29),dati$.[a] <-"Some other", dati$.)
+for (a in 1:length(data_sp$.)) {
+  
+  ifelse(!(data_sp$.[a] %in% risp29),data_sp$.[a] <-"Some other", data_sp$.)
   
 }
 
-dati$. <- str_replace(dati$., "malattie rare", "Rare diseases")
-dati$. <- str_replace(dati$., "oncologia", "Oncology")
-dati$. <- str_replace(dati$., "metagenomica batterica", "Bacterial metagenomics")
-dati$. <- str_replace(dati$., "metagenomica virale", "Viral metagenomics")
+data_sp$. <- str_replace(data_sp$., "malattie rare", "Rare disease")
+data_sp$. <- str_replace(data_sp$., "oncologia", "Oncology")
+data_sp$. <- str_replace(data_sp$., "metagenomica batterica", "Bacterial metagenomics")
+data_sp$. <- str_replace(data_sp$., "metagenomica virale", "Viral metagenomics")
 
-dati <- as.data.frame(table(dati))
+data_sp <- as.data.frame(table(data_sp))
 
-#frazione delle variabili nel donut
-dati$fraction = dati$Freq / sum(dati$Freq)
+# donut setting
+data_sp$fraction = data_sp$Freq / sum(data_sp$Freq)
 
-# top e bottom di ogni rettangolo per il donut
-dati$ymax = cumsum(dati$fraction)
-dati$ymin = c(0, head(dati$ymax, n=-1))
+data_sp$ymax = cumsum(data_sp$fraction)
+data_sp$ymin = c(0, head(data_sp$ymax, n=-1))
 
-# Compute label position
-dati$labelPosition <- (dati$ymax + dati$ymin) / 2
+data_sp$labelPosition <- (data_sp$ymax + data_sp$ymin) / 2
+ 
+# piechart
 
-# piechart specializzazione dati BB
-
-chart_data <- ggplot(dati, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=.)) +
+chart_data <- ggplot(data_sp, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=.)) +
   geom_rect() +
   xlim(c(2, 4)) +
-  geom_text(x= 4.3, aes(y=labelPosition, label = paste0("N = ", Freq, ",\n", round(fraction*100, digit = 1), "%")), size = 2.8, fontface = "bold") +
+  geom_text(x= 4.3, aes(y=labelPosition, label = paste0("N = ", Freq, ",\n", round(fraction*100, digit = 1), "%")), size = 3.1, fontface = "bold") +
   coord_polar("y", start=0)+
   theme_void() +
   labs(title = "Biobanked data specialization", x = "", y = "", ) +
   theme(legend.position = "right",
         legend.direction = "vertical",
-        plot.title = element_text(face = "bold", size = 16, hjust = 0.5)
-  ) +
-  guides(fill = guide_legend(title = "Answers", reverse = T)) +
-  scale_fill_manual(values = mycolors)
+        plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+        text = element_text(family = "Arial")
+        ) +
+    guides(fill = guide_legend(title = "Answers", reverse = T)) +
+   scale_fill_manual(values = mycolors)
 
 
-# data type
+# correlated data ---------------------------------------------
 
-tip_dati <- survey[[30]] %>%
-  strsplit(";") %>%
-  unlist()
-
-risp30 <- c("Lifestyle dataset", "Environmental dataset", "Physiological dataset", "Biochemical dataset", "Clinical dataset", "Psychological dataset", "Genomic dataset (sequences)", "Genomic dataset (variants)", "Proteomic dataset", "Metabolomic dataset", "Body (Radiological) image", "Whole slide image", "Photo image", "Genealogical records")
-
-for (a in 1:length(tip_dati)) {
-  ifelse(!(tip_dati[a] %in% risp30),tip_dati[a] <-"Some other", tip_dati)
-}
-
-tip_dati<- as.data.frame(table(tip_dati)) %>%
-  move2last(1)
-
-tip_dati <- tip_dati[order(tip_dati$Freq, decreasing = T),]
-tip_dati$tip_dati <- factor(tip_dati$tip_dati, levels = tip_dati$tip_dati)
-
-# barplot
-
-data2 <-  ggplot(tip_dati, aes(x = tip_dati, y = Freq, fill = tip_dati)) +
-                              geom_bar(stat = "identity", width = 0.5, color = "transparent", show.legend = F) +
-                              theme_minimal()+
-                              geom_rect(
-                                aes(xmin = -Inf, xmax = 17, ymin = -Inf, ymax = 39),
-                                fill = NA,
-                                color = "lightgrey"
-                              ) +
-                              geom_text(aes(label = Freq),vjust = -0.5) +
-                              labs(title = "Data type correlated to Biobanks", x = "", y = "") +
-                              theme(legend.position = "right",
-                                    axis.text.x = element_text(angle = -45, hjust = 0),
-                                    plot.title = element_text(face = "bold", size = 16, hjust = 0.5)) +
-                              guides(fill = guide_legend(title = "")) +
-                              scale_fill_manual(values = mycolors)
-
-
-# data type -------------------------------------------
-
-tip_dati <- survey[[30]] %>%
+data_type <- survey[[30]] %>%
   strsplit(";") %>%
   unlist()
 
 risp30 <- c("Lifestyle dataset", "Environmental dataset", "Physiological dataset", "Biochemical dataset", "Clinical dataset", "Psychological dataset", "Genomic dataset (sequences)", "Genomic dataset (variants)", "Proteomic dataset", "Metabolomic dataset", "Body (Radiological) image", "Whole slide image", "Photo image", "Genealogical records")
 
 
-for (a in 1:length(tip_dati)) {
+for (a in 1:length(data_type)) {
   
-  ifelse(!(tip_dati[a] %in% risp30),tip_dati[a] <-"Some other", tip_dati)
+  ifelse(!(data_type[a] %in% risp30),data_type[a] <-"Some other", data_type)
   
 }
 
-tip_dati<- as.data.frame(table(tip_dati)) 
+data_type<- as.data.frame(table(data_type)) 
 
-tip_dati <- tip_dati[order(tip_dati$Freq, decreasing = T),]
-tip_dati <- move2last(tip_dati,9)
-tip_dati$tip_dati <- factor(tip_dati$tip_dati, levels = tip_dati$tip_dati)
+data_type <- data_type[order(data_type$Freq, decreasing = T),]
+data_type <- move2last(data_type,9)
+data_type$data_type <- factor(data_type$data_type, levels = data_type$data_type)
 
-# barplot tipi di dati della BB
+# barplot 
 
-chart_data2 <- ggplot(tip_dati, aes(x = tip_dati, y = Freq, fill = tip_dati)) +
+chart_data2 <- ggplot(data_type, aes(x = data_type, y = Freq, fill = data_type)) +
   geom_bar(stat = "identity", width = 0.5, color = "transparent") +
   theme_minimal()+
   geom_text(aes(label = Freq),vjust = -0.5) +
@@ -1093,9 +1019,10 @@ chart_data2 <- ggplot(tip_dati, aes(x = tip_dati, y = Freq, fill = tip_dati)) +
         axis.text.y = element_text(size = 12),
         axis.line = element_line(colour = "black"),
         panel.background = element_rect(),
-        plot.margin = margin(0,1,0,0, "cm")) + 
+        plot.margin = margin(0,1,0,0, "cm"),
+        text = element_text(family = "Arial")) + 
   guides(fill = guide_legend(title = "")) +
-  scale_fill_manual(values = mycolors) + 
+   scale_fill_manual(values = mycolors) + 
   scale_y_continuous(expand = expansion( mult = c(0, 0.1)))
 
 
@@ -1113,14 +1040,14 @@ ont <- ont[ont != "etc."]
 
 risp31 <- c("FMA","NCIt","ORDO","OMIM","HPO","MIABIS","MedDRA","OBIB","ICD","Not","Unsure")
 
-altre_ont <- c()
+other_ont <- c()
 
 for (ontologie in 1:length(ont)) {
   if(ont[ontologie] %in% risp31)  {
-    ontologie <- ontologie 
+  ontologie <- ontologie 
   } else {
-    altre_ont <- c(altre_ont, ont[ontologie])
-    ont[ontologie] <- "Some other"
+  other_ont <- c(other_ont, ont[ontologie])
+  ont[ontologie] <- "Some other"
   }
 }  
 
@@ -1133,7 +1060,7 @@ ont <- move2last(ont, 3) %>%
 
 ont$ont <- factor(ont$ont, levels = ont$ont)
 
-# barplot ontologie
+# barplot 
 
 chart_onto <- ggplot(ont, aes(x = ont, y = Freq, fill = ont)) +
   geom_bar(stat = "identity", width = 0.5, color = "transparent") +
@@ -1146,30 +1073,30 @@ chart_onto <- ggplot(ont, aes(x = ont, y = Freq, fill = ont)) +
         axis.text.x = element_text(size = 12, angle = -45, hjust = 0),
         axis.text.y = element_text(size = 12),
         axis.line = element_line(colour = "black"),
-        panel.background = element_rect()
-  ) + 
-  scale_fill_manual(values = mycolors) + 
+        panel.background = element_rect(),
+        text = element_text(family = "Arial")
+        ) + 
+   scale_fill_manual(values = mycolors) + 
   scale_y_continuous(expand = expansion( mult = c(0, 0.1)))
 
-# data subset for network -----------------------------
 
-cond <- as.data.frame(table(survey[[32]]))
+# data sharing - specialiazed network -----------------
 
-cond$Var1 <- str_replace(cond$Var1, "Sì", "Yes")
+data_share <- as.data.frame(table(survey[[32]]))
 
-#frazione delle variabili nel donut
-cond$fraction = cond$Freq / sum(cond$Freq)
+data_share$Var1 <- str_replace(data_share$Var1, "Sì", "Yes")
 
-# top e bottom di ogni rettangolo per il donut
-cond$ymax = cumsum(cond$fraction)
-cond$ymin = c(0, head(cond$ymax, n=-1))
+# donut setting
+data_share$fraction = data_share$Freq / sum(data_share$Freq)
 
-# Compute label position
-cond$labelPosition <- (cond$ymax + cond$ymin) / 2
+data_share$ymax = cumsum(data_share$fraction)
+data_share$ymin = c(0, head(data_share$ymax, n=-1))
 
-# piechart sottoinsieme di dati presenti
+data_share$labelPosition <- (data_share$ymax + data_share$ymin) / 2
+ 
+# piechart 
 
-chart_network <- ggplot(cond, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Var1)) +
+chart_network <- ggplot(data_share, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Var1)) +
   geom_rect() +
   xlim(c(2, 4)) +
   geom_text(x= 3.5, aes(y=labelPosition, label = paste0("N = ", Freq, ",\n", round(fraction*100, digit = 1), "%")), size = 5, fontface = "bold") +
@@ -1178,56 +1105,60 @@ chart_network <- ggplot(cond, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Var
   labs(title = "Are there subsets of data shared in specialized networks?", x = "", y = "", ) +
   theme(legend.position = "right",
         legend.direction = "vertical",
-        plot.title = element_text(face = "bold", size = 16, hjust = 0.5)
-  ) +
-  guides(fill = guide_legend(title = "Answers")) +
-  scale_fill_manual(values = mycolors)
+        plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+        text = element_text(family = "Arial")
+        ) +
+    guides(fill = guide_legend(title = "Answers")) +
+   scale_fill_manual(values = mycolors)
 
 
 # network ----------------------------
 
-reti_cond <- survey[[33]] %>%
+sharing_net <- survey[[33]] %>%
   na.omit() %>% 
   strsplit(";|,|; |, ") %>%
   unlist() %>%
   table() %>%
   as.data.frame( stringsAsFactors = F)
 
-reti_cond <- reti_cond[-1,]
+sharing_net <- sharing_net[-1,]
 
-for (a in 1:length(reti_cond$.)) {
+for (a in 1:length(sharing_net$.)) {
   
-  ifelse(reti_cond$Freq[a] <= 1, reti_cond$.[a] <-"Some other", reti_cond$.)
+  ifelse(sharing_net$Freq[a] <= 1, sharing_net$.[a] <-"Some other", sharing_net$.)
   
 }
 
-reti_cond <-reti_cond %>%
-  group_by(reti_cond$.) %>%
-  summarize(Freq = sum(Freq))
+sharing_net <-sharing_net %>%
+  group_by(sharing_net$.) %>%
+  summarize(Freq = sum(Freq)) %>%
+  move2last(2)
+ 
 
+# donut setting
+sharing_net$fraction = sharing_net$Freq / sum(sharing_net$Freq)
 
-#frazione delle variabili nel donut
-reti_cond$fraction = reti_cond$Freq / sum(reti_cond$Freq)
+sharing_net$ymax = cumsum(sharing_net$fraction)
+sharing_net$ymin = c(0, head(sharing_net$ymax, n=-1))
 
-# top e bottom di ogni rettangolo per il donut
-reti_cond$ymax = cumsum(reti_cond$fraction)
-reti_cond$ymin = c(0, head(reti_cond$ymax, n=-1))
-reti_cond$labelPosition <- (reti_cond$ymax + reti_cond$ymin) / 2
+sharing_net$labelPosition <- (sharing_net$ymax + sharing_net$ymin) / 2
 
-reti_cond$`reti_cond$.` <- factor(reti_cond$`reti_cond$.`, levels = reti_cond$`reti_cond$.`)
+sharing_net$`sharing_net$.` <- factor(sharing_net$`sharing_net$.`, levels = sharing_net$`sharing_net$.`)
 
-# donut plot
+# donut
 
-chart_network2 <- ggplot(reti_cond, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=`reti_cond$.`)) +
-  geom_rect() +
+chart_network2 <- ggplot(sharing_net, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=`sharing_net$.`)) +
+   geom_rect() +
   geom_text(x= 3.5, aes(y=labelPosition, label = paste0("N = ", Freq, ",\n", round(fraction*100, digit = 1), "%")), size = 5, fontface = "bold") +
-  coord_polar(theta="y") + 
-  xlim(c(2, 4)) + 
+   coord_polar(theta="y") + 
+   xlim(c(2, 4)) + 
   theme_void() +
   labs(title = "Networks in which data are shared") +
-  theme(plot.title = element_text(face = "bold", size = 16, hjust = 0.5)) +
-  guides(fill = guide_legend(title = "Answers")) +
-  scale_fill_manual(values = mycolors)
+  theme(plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+        text = element_text(family = "Arial")) +
+    guides(fill = guide_legend(title = "Answers")) +
+   scale_fill_manual(values = mycolors)
+
 
 # data cross-ref ----------------------------------
 
@@ -1236,17 +1167,15 @@ cross <- as.data.frame(table(survey[[34]]))
 cross$Var1 <- str_replace(cross$Var1, "Si", "Yes")
 cross$Var1 <- str_replace(cross$Var1, "Non so", "Unsure")
 
-#frazione delle variabili nel donut
+# donut setting
 cross$fraction = cross$Freq / sum(cross$Freq)
 
-# top e bottom di ogni rettangolo per il donut
 cross$ymax = cumsum(cross$fraction)
 cross$ymin = c(0, head(cross$ymax, n=-1))
 
-# Compute label position
 cross$labelPosition <- (cross$ymax + cross$ymin) / 2
 
-# piechart possibilità di incrociare dati
+# piechart
 
 chart_data4 <- ggplot(cross, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Var1)) +
   geom_rect() +
@@ -1257,12 +1186,15 @@ chart_data4 <- ggplot(cross, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Var1
   labs(title = "Is it possible to cross-reference data with ones on another \ninstitution's or terrritorial system?", x = "", y = "", ) +
   theme(legend.position = "right",
         legend.direction = "vertical",
-        plot.title = element_text(face = "bold", size = 16, hjust = 0.5)
-  ) +
-  guides(fill = guide_legend(title = "Answers")) +
-  scale_fill_manual(values = mycolors)
+        plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+        text = element_text(family = "Arial")
+        ) +
+    guides(fill = guide_legend(title = "Answers")) +
+   scale_fill_manual(values = mycolors)
+
 
 # cross data 2 ---------------------------------------
+how data are cross-referenced ----------------------------------------------------
 
 sist_cross <- survey[[35]] %>%
   na.omit() %>%
@@ -1270,7 +1202,6 @@ sist_cross <- survey[[35]] %>%
   unlist() %>%
   table() %>%
   as.data.frame( stringsAsFactors = F) 
-
 
 sist_cross <- sist_cross[order(sist_cross$Freq, decreasing = T),]
 
@@ -1282,47 +1213,45 @@ sist_cross$. <- str_replace(sist_cross$.,"è possibile incrcociare ma non in mod
 
 sist_cross$.<- factor(sist_cross$., levels = sist_cross$.)
 
-#barplot quali sistemi
+# barplot 
 
 chart_data5 <- ggplot(sist_cross, aes(x = ., y = Freq, fill = .)) +
   geom_bar(stat = "identity", width = 0.5, color = "transparent") +
   theme_minimal()+
   geom_text(aes(label = Freq),vjust = -0.1) +
-  labs(title = "How can the data be cross-referenced?", x = "", y = "") +
-  scale_x_discrete(labels = "", "", "") +
+  labs(title = "How can the data be cross-referenced?", x = "Answers", y = "N Biobanks") +
   theme(legend.position = "bottom",
         legend.direction = "vertical",
         plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
         axis.title = element_text(size = 12),
-        axis.text.x = element_text(size = 12, angle = -45, hjust = 0),
+        axis.text.x = element_blank(),
         axis.text.y = element_text(size = 12),
         axis.line = element_line(colour = "black"),
-        panel.background = element_rect()
-  ) +
+        panel.background = element_rect(),
+        text = element_text(family = "Arial")
+        ) +
   guides(fill = guide_legend(title = "Answers",)) +
-  scale_fill_manual(values = mycolors) + 
+   scale_fill_manual(values = mycolors) + 
   scale_y_continuous(expand = expansion( mult = c(0, 0.1)))
 
 
 # digital informe consent -----------------------------------
 
-cons_inf <- as.data.frame(table(survey[[36]]))
+inf_cons <- as.data.frame(table(survey[[36]]))
 
-cons_inf$Var1 <- str_replace(cons_inf$Var1, "Si", "Yes")
+inf_cons$Var1 <- str_replace(inf_cons$Var1, "Si", "Yes")
 
-#frazione delle variabili nel donut
-cons_inf$fraction = cons_inf$Freq / sum(cons_inf$Freq)
+# donut setting
+inf_cons$fraction = inf_cons$Freq / sum(inf_cons$Freq)
 
-# top e bottom di ogni rettangolo per il donut
-cons_inf$ymax = cumsum(cons_inf$fraction)
-cons_inf$ymin = c(0, head(cons_inf$ymax, n=-1))
+inf_cons$ymax = cumsum(inf_cons$fraction)
+inf_cons$ymin = c(0, head(inf_cons$ymax, n=-1))
 
-# Compute label position
-cons_inf$labelPosition <- (cons_inf$ymax + cons_inf$ymin) / 2
+inf_cons$labelPosition <- (inf_cons$ymax + inf_cons$ymin) / 2
+ 
+# piechart 
 
-# piechart consenso inforato digitale/elettronico
-
-chart_ic <- ggplot(cons_inf,aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Var1)) +
+chart_ic <- ggplot(inf_cons,aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Var1)) +
   geom_rect() +
   xlim(c(2, 4)) +
   coord_polar("y", start=0)+
@@ -1332,20 +1261,22 @@ chart_ic <- ggplot(cons_inf,aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Var1)
   theme(legend.position = "right",
         legend.direction = "vertical",
         plot.title = element_text(face = "bold", size = 16, hjust = 0.5)
-  ) +
-  guides(fill = guide_legend(title = "Answers")) +
-  scale_fill_manual(values = mycolors)
+        ) +
+    guides(fill = guide_legend(title = "Answers")) +
+   scale_fill_manual(values = mycolors)
+
 
 # iformed consent model -----------------------------
-tipo_cons <- survey[[37]] %>%
+
+ic_type <- survey[[37]] %>%
   na.omit()
 
-tipo_cons <- ifelse(grepl("dinamic", tipo_cons, ignore.case = T), "Dynamic", tipo_cons)
-tipo_cons <- as.data.frame(table(tipo_cons))
+ic_type <- ifelse(grepl("dinamic", ic_type, ignore.case = T), "Dynamic", ic_type)
+ic_type <- as.data.frame(table(ic_type))
 
 # barplot
 
-chart_ic_model <- ggplot(tipo_cons, aes(x = tipo_cons, y =Freq, fill = tipo_cons)) +
+chart_ic_model <- ggplot(ic_type, aes(x = ic_type, y =Freq, fill = ic_type)) +
   geom_bar(stat = "identity", width = 0.5, color = "transparent") +
   theme_minimal() +
   geom_text(aes(label = Freq),vjust = -0.3) +
@@ -1356,12 +1287,9 @@ chart_ic_model <- ggplot(tipo_cons, aes(x = tipo_cons, y =Freq, fill = tipo_cons
         axis.text.x = element_text(size = 12),
         axis.text.y = element_text(size = 12),
         axis.line = element_line(colour = "black"),
-        panel.background = element_rect()
-  ) +
-  scale_fill_manual(values = mycolors) + 
+        panel.background = element_rect(),
+        text = element_text(family = "Arial")
+        ) +
+   scale_fill_manual(values = mycolors) + 
   scale_y_continuous(expand = expansion( mult = c(0, 0.1)))
-
-
-
-
 
