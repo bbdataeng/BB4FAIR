@@ -445,55 +445,57 @@ display: none;
 </div>
 
 
-<pre class="r"><code>punteggi &lt;- matrix(0, nrow = length(bb), ncol = length(quant$id), dimnames = list(bb, quant$question))
+<pre class="r"><code># matrix scoring system
+tiering &lt;- matrix(0, nrow = length(bb), ncol = length(quant$id), dimnames = list(bb, quant$question))
 
-survey[is.na(survey)] &lt;- &quot;non compilato&quot;
+survey[is.na(survey)] &lt;- &quot;not compiled&quot;
 
-#referente IT 2/H
-for (n in c(1:length(survey$`In che ruolo si sta compilando questa survey? `))) {
+
+# IT head 4/J
+for (n in c(1:length(survey[[4]]))) {
   
   
-  if(survey$`In che ruolo si sta compilando questa survey? `[n] == &quot;Referente informatico&quot;){
+  if(survey[[4]][n] != &quot;not compiled&quot;){
     
-    punteggi[n,&quot;IT contact person&quot;] = quant$complete[1]
+    tiering[n,&quot;IT contact person&quot;] = quant$complete[1]
 
   }
   
 }
 
-#personale dedicato 6/L
-for (n in c(1:length(survey$`In caso di risposta positiva, indicare quali delle seguenti attività sono svolte dal personale dedicato della biobanca (risposta multipla)`))) {
+# dedicated staff 6/L
+for (n in c(1:length(survey[[6]]))) {
  
-  if( grepl(&quot;Gestione dei dati associati ai campioni&quot;, survey$`In caso di risposta positiva, indicare quali delle seguenti attività sono svolte dal personale dedicato della biobanca (risposta multipla)`[n])  ){
+  if( grepl(&quot;Gestione dei dati associati ai campioni&quot;, survey[[6]][n])  ){
     
-    punteggi[n,&quot;dedicated personnel&quot;] = quant$complete[2]
+    tiering[n,&quot;dedicated personnel&quot;] = quant$complete[2]
     
-  } else if ((survey$`In caso di risposta positiva, indicare quali delle seguenti attività sono svolte dal personale dedicato della biobanca (risposta multipla)`[n] !=&quot;non compilato&quot;) &amp;&amp; (!(&quot;Gestione dei dati associati ai campioni&quot; %in% survey$`In caso di risposta positiva, indicare quali delle seguenti attività sono svolte dal personale dedicato della biobanca (risposta multipla)`[n]))) {
+  } else if ((survey[[6]][n] !=&quot;not compiled&quot;) &amp;&amp; (!(&quot;Gestione dei dati associati ai campioni&quot; %in% survey[[6]][n]))) {
   
-  punteggi[n,&quot;dedicated personnel&quot;] = quant$partial[2]
+  tiering[n,&quot;dedicated personnel&quot;] = quant$partial[2]
   
 }
   
 }
 
-#terminologia 9/O
-for (n in c(1:length(survey$`Se sì, quali? `))) {
+# terminology 9/O
+for (n in c(1:length(survey[[9]]))) {
  
-  term &lt;- survey$`Se sì, quali? `[n] %&gt;% 
+  term &lt;- survey[[9]][n] %&gt;% 
     strsplit(&quot;;&quot;) %&gt;% 
     unlist()
  
- if ( term[1] != &quot;non compilato&quot; ) {
+ if ( term[1] != &quot;not compiled&quot; ) {
    
-   punteggio = (quant$partial[3]*length(term))
+   score = (quant$partial[3]*length(term))
    
-   if (punteggio &lt;= 3) {
+   if (score &lt;= 3) {
      
-   punteggi[n,&quot;ontologies&quot;]  = (quant$partial[3]*length(term))
+   tiering[n,&quot;ontologies&quot;]  = (quant$partial[3]*length(term))
      
-   } else if (punteggio &gt; 3)  {
+   } else if (score &gt; 3)  {
      
-     punteggi[n,&quot;ontologies&quot;] = 3
+     tiering[n,&quot;ontologies&quot;] = 3
      
    }
  }
@@ -501,51 +503,50 @@ for (n in c(1:length(survey$`Se sì, quali? `))) {
 }
 
 
-#cdm P
+# CDM P
 for (n in c(1:length(survey[,10]))) {
   
   if(survey[n,10] == &quot;Si&quot;){
     
-    punteggi[n,&quot;CDM&quot;] = quant$complete[4]
+    tiering[n,&quot;CDM&quot;] = quant$complete[4]
     
   } 
 }
 
 
-#lims T/14
-sist_lims &lt;- c(&quot;BIMS1&quot;, &quot;BIMS2&quot;, &quot;BIMS3&quot;, &quot;BIMS4&quot;, &quot;BIMS5&quot;, &quot;BIMS6&quot;, &quot;BIMS7&quot;, 
-               &quot;BIMS8&quot;, &quot;BIMS9&quot;, &quot;BIMS10&quot;, &quot;BIMS11&quot;, &quot;BIMS12&quot;, &quot;BIMS13&quot;)
+# B/LIMS T/14
+bims &lt;- c(&quot;BIMS1&quot;, &quot;BIMS2&quot;, &quot;BIMS3&quot;, &quot;BIMS4&quot;, &quot;BIMS5&quot;, &quot;BIMS6&quot;, &quot;BIMS7&quot;, 
+               &quot;BIMS8&quot;)
 
-for (n in c(1:length(survey$`Se esiste un sistema informatico dedicato, di che tipo è (fornire il nome del sistema)? `))) {
+for (n in c(1:length(survey[[14]]))) {
  
-  lims &lt;- survey$`Se esiste un sistema informatico dedicato, di che tipo è (fornire il nome del sistema)? `[n] %&gt;%
+  lims &lt;- survey[[14]][n] %&gt;%
     strsplit( &quot;;|- &quot;) %&gt;% 
     unlist()
   
  
-  
   for (lim in lims) {
     
-    if ( lim %in% sist_lims) {
+    if ( lim %in% bims) {
       
-      punteggi[n,&quot;LIMS&quot;] = quant$complete[5]
+      tiering[n,&quot;LIMS&quot;] = quant$complete[5]
       break
       
-    } else if ( lim == &quot;non compilato&quot;) {
+    } else if ( lim == &quot;not compiled&quot;) {
   
-  punteggi[n,&quot;LIMS&quot;] = quant$empty[5]
+  tiering[n,&quot;LIMS&quot;] = quant$empty[5]
   
     } else {
     
-      punteggi[n,&quot;LIMS&quot;] = quant$partial[5]
+      tiering[n,&quot;LIMS&quot;] = quant$partial[5]
   }
     
   }
   
 }
 
-#cartella_clinica 15/U
-for (n in c(1:length(survey$`Se esiste un sistema informatico dedicato, questo sistema è collegato al sistema di gestione dei dati clinici (per esempio sistemi di cartella clinica o sistemi informativi sanitari territoriali?)`))) {
+# clinical data 15/U
+for (n in c(1:length(survey[[15]]))) {
 
   cc &lt;- survey[n,15]
   cc &lt;- ifelse(grepl(&quot;^si|sì&quot;, cc, ignore.case = TRUE), &quot;si&quot;,cc)
@@ -555,206 +556,193 @@ for (n in c(1:length(survey$`Se esiste un sistema informatico dedicato, questo s
   
   if ( cc == &quot;si&quot; ) {
   
-  punteggi[n,&quot;clinical record&quot;] = quant$complete[6]
+  tiering[n,&quot;clinical record&quot;] = quant$complete[6]
   
   } else {
     
-      punteggi[n,&quot;clinical record&quot;] = quant$empty[6]
+      tiering[n,&quot;clinical record&quot;] = quant$empty[6]
   }
 }
 
 
-#lims-2 16/V
-for (n in c(1:length(survey$`Se NON esiste un sistema informatico dedicato, come sono conservati i dati relativi ai campioni biologici contenuti nella biobanca?`))) {
+# lims-2 16/V
+for (n in c(1:length(survey[[16]]))) {
 
-   if ( survey[n,16] == &quot;non compilato&quot; ) {
+   if ( survey[n,16] == &quot;not compiled&quot; ) {
   
-  punteggi[n,&quot;LIMS-2&quot;] = quant$empty[7]
+  tiering[n,&quot;LIMS-2&quot;] = quant$empty[7]
   
    }else {
     
-      punteggi[n,&quot;LIMS-2&quot;] = quant$complete[7]
+      tiering[n,&quot;LIMS-2&quot;] = quant$complete[7]
   }
 }
 
-#infrastruttura IT 17/W
-for (n in c(1:length(survey$`L&#39;istituto ha accesso ad una infrastruttura informatica, fisica o virtuale, dedicata ai dati o al processamento dei dati associati ai campioni biologici contenuti nella biobanca?`))) {
+# IT infrastructure 17/W
+for (n in c(1:length(survey[[17]]))) {
   
   if ( survey[n,17] == &quot;Si&quot; ) {
   
-  punteggi[n,&quot;IT infrastructure&quot;] = quant$complete[8]
+  tiering[n,&quot;IT infrastructure&quot;] = quant$complete[8]
   
   } 
 }
 
 
-#storage 19/Y
-for (n in c(1:length(survey$`La biobanca ha a disposizione un sistema di storage massivo (capacità maggiori di 20TB), comprendente di backup o sistema di ridondanza (RAID), utilizzabile a scopi di ricerca? `))) {
+# storage 19/Y
+for (n in c(1:length(survey[[19]]))) {
   
    if ( survey[n,19] == &quot;Si&quot; ) {
   
-  punteggi[n,&quot;storage&quot;] = quant$complete[9]
+  tiering[n,&quot;storage&quot;] = quant$complete[9]
   
   } 
 }
 
 
-#componenti IT 20/Z
-for (n in c(1:length(survey$`La biobanca può allocare, autonomamente o tramite il suo CED, risorse di calcolo per dei servizi di Ricerca Federata? (e.g., macchine virtuali, containers, nuovi computer dedicati, etc.). La Ricer...`))) {
+# IT components 20/Z
+for (n in c(1:length(survey[[20]]))) {
 
   if ( survey[n,20] == &quot;Si&quot; ) {
   
-  punteggi[n,&quot;IT components&quot;] = quant$complete[10]
+  tiering[n,&quot;IT components&quot;] = quant$complete[10]
   
   } 
 }
 
-#dwh 22/AB
-for (n in c(1:length(survey$`L&#39;istituto a cui afferisce la biobanca ha un collettore di dati (quali ad esempio un Data Warehouse o un Data Lake) e/o ha a disposizione una piattaforma di Business Intelligence?&quot;`))) {
+# DWH 22/AB
+for (n in c(1:length(survey[[22]]))) {
  
   if (survey[n,22] == &quot;Si&quot; ) {
   
-  punteggi[n,&quot;DWH&quot;] = quant$complete[11]
+  tiering[n,&quot;DWH&quot;] = quant$complete[11]
   
   } 
 }
 
 
 
-## annotazioni 30/AI
+# annotation 30/AI
 for (n in c(1:length(survey[,30]))) {
  
   ann &lt;- survey[n,30] %&gt;%
     strsplit( &quot;;&quot;) %&gt;% 
     unlist()
   
-  punteggio = (quant$partial[12]*length(ann))
+  score = (quant$partial[12]*length(ann))
    
-   if (punteggio &lt;= 3) {
+   if (score &lt;= 3) {
      
-   punteggi[n,&quot;annotations&quot;]  = (quant$partial[12]*length(ann))
+   tiering[n,&quot;annotations&quot;]  = (quant$partial[12]*length(ann))
      
-   } else if (punteggio &gt; 3)  {
+   } else if (score &gt; 3)  {
      
-     punteggi[n,&quot;annotations&quot;] = 3
+     tiering[n,&quot;annotations&quot;] = 3
      
    }
   
 }
 
 
-#intersezione dati clinici 34/AN
-for (n in c(1:length(survey$`Nel rispetto dei requisiti etici-legali previsti, è possibile incrociare dati relativi ai campioni con dati nei sistemi dell&#39;istituzione o in quelli territoriali?`))) {
+# clinical data intersection with other registry 34/AN
+for (n in c(1:length(survey[[34]]))) {
  
   if (survey[n,34] == &quot;Si&quot; ) {
   
-  punteggi[n,&quot;cross-reference data&quot;] = quant$complete[13]
+  tiering[n,&quot;cross-reference data&quot;] = quant$complete[13]
   
   } else {
     
-    punteggi[n,&quot;cross-reference data&quot;] = quant$empty[13]
+    tiering[n,&quot;cross-reference data&quot;] = quant$empty[13]
     
   }
 }
 
 #consenso informato 36/AP
-for (n in c(1:length(survey$`Nel rispetto dei requisiti etici-legali previsti, è possibile incrociare dati relativi ai campioni con dati nei sistemi dell&#39;istituzione o in quelli territoriali?`))) {
+for (n in c(1:length(survey[[34]]))) {
  
   if (survey[n,36] == &quot;Si&quot; ) {
   
-  punteggi[n,&quot;informed consent&quot;] = quant$complete[14]
+  tiering[n,&quot;informed consent&quot;] = quant$complete[14]
   
   } else {
     
-    punteggi[n,&quot;informed consent&quot;] = quant$empty[14]
+    tiering[n,&quot;informed consent&quot;] = quant$empty[14]
     
   }
 }</code></pre>
-<pre class="r"><code>total_score &lt;- vector(&quot;integer&quot;, length = length(punteggi[,1]))
+<pre class="r"><code># sum of the scores obtained
+total_score &lt;- vector(&quot;integer&quot;, length = length(tiering[,1]))
 
 for (n in 1:length(total_score)) {
   
-  total_score[n] = sum(punteggi[n,])
+  total_score[n] = sum(tiering[n,])
   
 }
 
-punteggi &lt;- punteggi %&gt;%
+tiering &lt;- tiering %&gt;%
   cbind(total_score) %&gt;%
   as.data.frame()
 
-tier_1 &lt;- data.frame(Biobanca = character(), Punteggio = numeric(), stringsAsFactors = F)
-tier_2 &lt;- data.frame(Biobanca = character(), Punteggio = numeric(), stringsAsFactors = F)
-tier_3 &lt;- data.frame(Biobanca = character(), Punteggio = numeric(), stringsAsFactors = F)
+tiering$`Biobank` &lt;- rownames(tiering)
+tiering &lt;- tiering %&gt;%
+  relocate(`Biobank`)</code></pre>
+<pre class="r"><code># setting tertiles
+tiering &lt;- tiering[order(tiering$total_score, decreasing = T),]
 
-# for (score in 1:length(punteggi$punteggio_totale)) {
-#  
-#   if (punteggi$punteggio_totale[score]&gt;20) {
-#     result = c((survey[score,1]), (punteggi[score,15]))
-#     tier_1 &lt;- rbind(tier_1, result)
-#       
-#   } else if (punteggi$punteggio_totale[score]&gt;10){
-#     result = c((survey[score,1]), (punteggi[score,15]))
-#     tier_2 &lt;- rbind(tier_2, result)
-# 
-#   } else {
-#     result = c((survey[score,1]), (punteggi[score,15]))
-#     tier_3 &lt;- rbind(tier_3, result)
-#     
-#   }
-#   
-# }</code></pre>
-<pre class="r"><code># knitr::kable(punteggi, format=&quot;markdown&quot;, caption = &quot;sommatoria punteggi&quot;)
-# knitr::kable(tier_1[order(as.integer(tier_1[,2]), decreasing = T),], format=&quot;markdown&quot;, col.names = c(&quot;Biobanca&quot;, &quot;Punteggio&quot;), row.names = F, caption = &quot;Tier 1&quot;)
-# knitr::kable(tier_2[order(as.integer(tier_2[,2]), decreasing = T),], format=&quot;markdown&quot;, col.names = c(&quot;Biobanca&quot;, &quot;Punteggio&quot;),  row.names = F, caption =  &quot;Tier 2&quot;)
-# knitr::kable(tier_3[order(as.integer(tier_3[,2]), decreasing = T),], format=&quot;markdown&quot;, col.names = c(&quot;Biobanca&quot;, &quot;Punteggio&quot;),  row.names = F, caption = &quot;Tier 3&quot;)</code></pre>
-<pre class="r"><code>row &lt;- gsub(&quot;\\.&quot;, &quot; &quot;, rownames(punteggi))
-punteggi$`Biobank` &lt;- row
-punteggi &lt;- punteggi %&gt;%
-  relocate(`Biobank`)
+tertile_1 &lt;- data.frame(Biobank = character(), Score = numeric(), stringsAsFactors = F)
+tertile_2 &lt;- data.frame(Biobank = character(), Score = numeric(), stringsAsFactors = F)
+tertile_3 &lt;- data.frame(Biobank = character(), Score = numeric(), stringsAsFactors = F)
 
-wb &lt;- createWorkbook()
-addWorksheet(wb, sheetName = &quot;total_score&quot;)
-addWorksheet(wb, sheetName = &quot;tier_1&quot;)
-addWorksheet(wb, sheetName = &quot;tier_2&quot;)
-addWorksheet(wb, sheetName = &quot;tier_3&quot;)</code></pre>
-<pre class="r"><code>punteggi &lt;- punteggi[order(punteggi$total_score, decreasing = T),]
+max_ter = round((length(tiering$total_score)/3))
+row &lt;- rownames(tiering)
 
-terzile_1 &lt;- data.frame(Biobanca = character(), Punteggio = numeric(), stringsAsFactors = F)
-terzile_2 &lt;- data.frame(Biobanca = character(), Punteggio = numeric(), stringsAsFactors = F)
-terzile_3 &lt;- data.frame(Biobanca = character(), Punteggio = numeric(), stringsAsFactors = F)
+# reorder and rename columns for the next analysis
+tiering &lt;- tiering %&gt;%
+  select(Biobank, `IT contact person`, `dedicated personnel`, ontologies, CDM, LIMS, `LIMS-2`, `IT infrastructure`, storage, `IT components`, DWH, `clinical record`, annotations, `cross-reference data`, `informed consent`, total_score)
 
-max_ter = round((length(punteggi$total_score)/3))
+colnames(tiering) &lt;- c(&quot;Biobank ID&quot;, &quot;IT head&quot; ,&quot;dedicated personnel&quot;,
+                          &quot;ontologies richness&quot;, &quot;common data models&quot;,
+                           &quot;BIMS&quot;, &quot;data management&quot;,
+                           &quot;IT infrastructures&quot;, &quot;massive storage&quot;,
+                           &quot;IT components&quot;, &quot;data warehouse&quot;,
+                           &quot;clinical data availability&quot;, &quot;annotations&quot;,
+                           &quot;registry data availability&quot;, &quot;informed consent&quot;, &quot;total_score&quot;)
 
-for (num in 1:length(punteggi$total_score)) { 
+
+for (num in 1:length(tiering$total_score)) { 
   
   if (num &lt;= max_ter) {
     
-    biobanca &lt;- data.frame( Biobanca =row[num], Punteggio = punteggi[num,&quot;total_score&quot;])
-    terzile_1 &lt;- rbind(terzile_1, biobanca)
+    biobank &lt;- data.frame( Biobank =row[num], Score = tiering[num,&quot;total_score&quot;])
+    tertile_1 &lt;- rbind(tertile_1, biobank)
     
   } else if (num &lt;= max_ter*2) {
     
-    biobanca &lt;- data.frame( Biobanca = row[num], Punteggio = punteggi[num,&quot;total_score&quot;])
-    terzile_2 &lt;- rbind(terzile_2, biobanca)
+    biobank &lt;- data.frame( Biobank = row[num], Score = tiering[num,&quot;total_score&quot;])
+    tertile_2 &lt;- rbind(tertile_2, biobank)
     
   } else if (num &lt;= max_ter*3) {
     
-    biobanca &lt;- data.frame( Biobanca = row[num], Punteggio = punteggi[num,&quot;total_score&quot;])
-    terzile_3 &lt;- rbind(terzile_3, biobanca)
+    biobank &lt;- data.frame( Biobank = row[num], Score = tiering[num,&quot;total_score&quot;])
+    tertile_3 &lt;- rbind(tertile_3, biobank)
     
   }
 
 }</code></pre>
-<pre class="r"><code>writeData(wb, sheet = &quot;total_score&quot;, punteggi)
-writeData(wb, sheet = &quot;tier_1&quot;, terzile_1, colNames = F)
-writeData(wb, sheet = &quot;tier_2&quot;, terzile_2, colNames = F)
-writeData(wb, sheet = &quot;tier_3&quot;, terzile_3, colNames = F)
+<pre class="r"><code>wb &lt;- createWorkbook()
+addWorksheet(wb, sheetName = &quot;total_score&quot;)
+addWorksheet(wb, sheetName = &quot;tier_1&quot;)
+addWorksheet(wb, sheetName = &quot;tier_2&quot;)
+addWorksheet(wb, sheetName = &quot;tier_3&quot;)
 
-saveWorkbook(wb, &quot;tiering_score.xlsx&quot;)
 
-# knitr::kable(terzile_1[order(as.integer(terzile_1[,2]), decreasing = T),], format=&quot;markdown&quot;, col.names = c(&quot;Biobanca&quot;, &quot;Punteggio&quot;), row.names = F, caption = &quot;Terzile 1&quot;)
-# knitr::kable(terzile_2[order(as.integer(terzile_2[,2]), decreasing = T),], format=&quot;markdown&quot;, col.names = c(&quot;Biobanca&quot;, &quot;Punteggio&quot;),  row.names = F, caption =  &quot;Terzile 2&quot;)
-# knitr::kable(terzile_3[order(as.integer(terzile_3[,2]), decreasing = T),], format=&quot;markdown&quot;, col.names = c(&quot;Biobanca&quot;, &quot;Punteggio&quot;),  row.names = F, caption = &quot;Terzile 3&quot;)</code></pre>
+writeData(wb, sheet = &quot;total_score&quot;, tiering)
+writeData(wb, sheet = &quot;tier_1&quot;, tertile_1, colNames = F)
+writeData(wb, sheet = &quot;tier_2&quot;, tertile_2, colNames = F)
+writeData(wb, sheet = &quot;tier_3&quot;, tertile_3, colNames = F)
+
+saveWorkbook(wb, &quot;tiering_score.xlsx&quot;)</code></pre>
 
 
 
