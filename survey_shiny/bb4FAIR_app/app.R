@@ -35,7 +35,7 @@ toastOpts <- list(
 # Load Data ---------------------------------------------------------------
 # tier_BB <- read_xlsx("/punteggi_tiering.xlsx", sheet = "abb")  
 
-scores <- read_xlsx("./tiering.xlsx", sheet = "total_score")
+scores <- read_xlsx("./tiering.xlsx")
 # 
 # scores <- read_xlsx("./punteggi_tiering.xlsx", sheet = "punteggi_totali")
 colnames(scores)[1] <- "BB_ID"
@@ -157,9 +157,9 @@ ui <-
                       ),
                       br(),
                       fluidRow(
-                        column(width = 3, class = "col-sm-3", plotOutput("radar1")),
-                        column(width = 3, class = "col-sm-3", plotOutput("radar2")),
                         column(width = 3, class = "col-sm-3", plotOutput("radar3")),
+                        column(width = 3, class = "col-sm-3", plotOutput("radar2")),
+                        column(width = 3, class = "col-sm-3", plotOutput("radar1")),
                         column(width = 3, class = "col-sm-3", plotOutput("legend"))
                       )
                     )),
@@ -173,12 +173,12 @@ ui <-
                                      bs4Card(title = "Ranking Position", label = NULL, uiOutput("slider"), width = 10, collapsible = FALSE)
                               ),
                               column(8,
-                                     bs4Card(plotOutput("eval_plot"), class = "plot-box", width = 12, headerBorder = FALSE, collapsible = FALSE)
+                                     bs4Card(plotOutput("eval_plot"), class = "plot-box", width = 6, height = 550, headerBorder = FALSE, collapsible = FALSE)
                               )
                             ),
                             fluidRow(
                               column(12,
-                                     bs4Card(title = "Suggestions", " ", width = 12, headerBorder = FALSE, collapsed = TRUE)
+                                     bs4Card(title = "Suggestions", " ", width = 8, headerBorder = FALSE, collapsed = TRUE)
                               )
                             )
                     )
@@ -253,7 +253,7 @@ server <- function(input, output) {
                                  annotations = annotations/max(annotations),
                                  informed_consent = informed_consent/max(informed_consent)
                           ),2)
-  tier_norm_BB$biobank <- seq(1,47)
+  tier_norm_BB$biobank <- seq(1,37)
   
   tier_norm_BB$tier <- ifelse(tier_norm_BB$total_score < 11, "Starting",
                               ifelse(tier_norm_BB$total_score < 21, "Advanced", "Mature"))
@@ -608,7 +608,7 @@ names(BB_data_fill)
                                             scale_y_continuous(labels = c("0%", "25%", "50%", "75%", "100%")) +
                                             scale_x_continuous(position = "top", breaks = seq(1,length(BB_data_fill[[input$bb_name_plot]]$nuova_variabile),1), 
                                                                labels = as.vector(BB_data[[input$bb_name_plot]]$nuova_variabile)) +
-                                            coord_flip()}, width = 600, height = 400)
+                                            coord_flip()}, width = 450, height = 500)
   
   ###############
   
@@ -654,7 +654,7 @@ names(BB_data_fill)
       id = "custom_slider",
       sliderInput(inputId = "inslider", label = NULL,
                   min = 1,
-                  max = 47,
+                  max = 37,
                   value = which(scores$BB_ID == input$bb_name_plot),
                   ticks = FALSE),
       tags$style(HTML(paste0(

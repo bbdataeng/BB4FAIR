@@ -730,7 +730,7 @@ chart_dwh2 <- ggplot(str_dwh, aes(x = ., y = Freq, fill = .)) +
 
  
 # ngs lab -------------------------------
-data storage infrastructure ------------------------------------------
+# data storage infrastructure ------------------------------------------
 
 str_dwh <- survey[[23]] %>%
   na.omit() %>%
@@ -764,7 +764,7 @@ chart_dwh2 <- ggplot(str_dwh, aes(x = ., y = Freq, fill = .)) +
 
 
 # ngs tech --------------------------------------
-ngs technology -----------------------------------------------
+# ngs technology -----------------------------------------------
 
 ngs_tech <- survey[[25]] %>%
   na.omit() %>%
@@ -1194,7 +1194,7 @@ chart_data4 <- ggplot(cross, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Var1
 
 
 # cross data 2 ---------------------------------------
-how data are cross-referenced ----------------------------------------------------
+# how data are cross-referenced ----------------------------------------------------
 
 sist_cross <- survey[[35]] %>%
   na.omit() %>%
