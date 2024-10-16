@@ -1,4 +1,3 @@
-
 # Import libraries  -------------------------------------------------------
 library(shiny)
 library(readxl)
@@ -50,8 +49,10 @@ scores$tier <- ifelse(scores$total_score > 20, "Mature",
 macroareas <- info_area[1:14,c("question","area")]
 macroareas$question <- str_replace(str_replace(macroareas$question, " ", "_"), "-", "_")
 
+
 scores <- scores %>%arrange(desc(total_score))
 scores$BB_ID <- paste0("BB", seq(1:dim(scores)[1]))
+
 
 ## question labels
 source("./plot.R") # import plots 
@@ -104,17 +105,18 @@ ui <-
                                   style = "display: flex; align-items: center; width: 100%;",
                                   fluidRow(
                                     column(
-                                      width = 6.5, 
-                                      offset = 1,
+                                      width = 2,
+                                      #offset = 1,
                                       align = "center",
-                                      span("Digital Maturity Survey for Biobanking", style = "font-size: 30px; color: white;")
+                                      img(src = 'Italy_grande_str_bbmri_bianco.png', style = "width: 80%;")
                                     ),
                                     column(
-                                      width = 2,
-                                      # offset = 1,
+                                      width = 6.5, 
+                                      offset = 0.5,
                                       align = "center",
-                                      img(src = 'Italy_grande_str_bbmri_bianco.png', style = "width: 70%;")
+                                      span("Digital Maturity Survey for Biobanking", style = "font-size: 30px; color: white;")
                                     )
+                                    
                                   )
                                 )
                 ),
@@ -173,12 +175,12 @@ ui <-
                                      bs4Card(title = "Ranking Position", label = NULL, uiOutput("slider"), width = 10, collapsible = FALSE)
                               ),
                               column(8,
-                                     bs4Card(plotOutput("eval_plot"), class = "plot-box", width = 6, height = 550, headerBorder = FALSE, collapsible = FALSE)
+                                     bs4Card(plotOutput("eval_plot"), class = "plot-box", width = 7, height = 550, headerBorder = FALSE, collapsible = FALSE)
                               )
                             ),
                             fluidRow(
                               column(12,
-                                     bs4Card(title = "Suggestions", " ", width = 8, headerBorder = FALSE, collapsed = TRUE)
+                                     bs4Card(title = "Suggestions", " ", width = 9, headerBorder = FALSE, collapsed = TRUE)
                               )
                             )
                     )
@@ -214,7 +216,7 @@ server <- function(input, output) {
       for (selected_macroarea in input$macroarea) {
         colname <- paste0(selected_macroarea, "_score")
         macro_scores <- c(macro_scores, colname)
-        # sum for the selected macroarea
+        # sum for the selected macro_area
         selected_cols <- macroareas$question[macroareas$area %in% selected_macroarea]
         final_cols <- c(final_cols, selected_cols)
         data[[colname]] <- rowSums(data[, selected_cols])}
@@ -226,8 +228,8 @@ server <- function(input, output) {
     colnames(data) <- c("Biobank ID", "IT head" ,"dedicated personnel",       
                         "ontologies richness", "common data models",        
                         "BIMS", "data management",           
-                        "IT infrastructures", "massive storage",           
-                        "IT components", "data warehouse",            
+                        "data server", "massive storage",           
+                        "service resources", "data warehouse",            
                         "clinical data availability", "annotations",               
                         "registry data availability", "informed consent", "total_score", "tier")
     data
@@ -247,8 +249,8 @@ server <- function(input, output) {
                           mutate(dedicated_personnel = dedicated_personnel/max(dedicated_personnel),
                                  ontologies_richness = ontologies_richness/max(ontologies_richness),
                                  BIMS = BIMS/max(BIMS),
-                                 IT_infrastructures = IT_infrastructures/max(IT_infrastructures),
-                                 IT_components = IT_components/max(IT_components), 
+                                 data_server = data_server/max(data_server),
+                                 service_resources = service_resources/max(service_resources), 
                                  data_warehouse = data_warehouse/max(data_warehouse),
                                  annotations = annotations/max(annotations),
                                  informed_consent = informed_consent/max(informed_consent)
@@ -280,9 +282,9 @@ server <- function(input, output) {
     "common data models",
     "BIMS",
     "data management",
-    "IT infrastructures",
+    "data server",
     "massive storage",
-    "IT components",
+    "service resources",
     "data warehouse",
     "clinical data availability",
     "annotations",
@@ -302,10 +304,8 @@ server <- function(input, output) {
   
   # preprocessing legend
   
-  # etichette <-c("ITh","pers","onto","CDM","BIMS","ITi","store","ITc","DWH",
-  #               "clin","DM","anno","regis","IC")
-  etichette <-c("ITh","pers","onto","CDM","BIMS","DM","ITi","store","ITc","DWH",
-                "clin","anno","regis","IC")
+  # etichette <-c("ITh","pers","onto","CDM","BIMS","ITi","store","ITc","DWH","clin","DM","anno","regis","IC")
+    etichette <-c("ITh","pers","onto","CDM","BIMS","DM","Dserv","store","Sres","DWH","clin","anno","regis","IC")
   
   etichette <- paste0("    ", etichette)
   
