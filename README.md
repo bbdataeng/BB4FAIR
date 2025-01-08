@@ -1,6 +1,6 @@
 # BB4FAIR: Implementation of a Digital Maturity Framework for Biobanking
 
-:bangbang: Check out the pre-print of this work available on ![Zenodo](https://doi.org/10.5281/zenodo.14012403).
+:bangbang: Check out the pre-print of this work available on [Zenodo](https://doi.org/10.5281/zenodo.14012403).
 
 ## Introduction
 Biobanks must ensure a fully engineered and digitalized process towards data FAIRification. To this aim, the first step is to assess the current digitalization status with quantitative metrics, particularly challenging given the multi-faceted regulatory and logistics aspects of biobanking.
