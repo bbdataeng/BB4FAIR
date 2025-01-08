@@ -502,7 +502,7 @@ chart_infrstr <- ggplot(inf, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=Var1
   geom_text(x= 3.5, aes(y=labelPosition, label = paste0("N = ", Freq, ",\n", round(fraction*100, digit = 1), "%")), size = 5, fontface = "bold") +
   coord_polar("y", start=0)+
   theme_void()+
-  labs(title = "Does the institution have access to an IT infrastructure dedicated to the data \nor data processing associated with the biobanked sample?", x = "", y = "", ) +
+  labs(title = "Does the institution have access to an IT infrastructure \nfor data processing associated with the biobanked sample?", x = "", y = "", ) +
   theme(legend.position = "right",
         legend.direction = "vertical",
         plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
@@ -1148,10 +1148,10 @@ sharing_net$`sharing_net$.` <- factor(sharing_net$`sharing_net$.`, levels = shar
 # donut
 
 chart_network2 <- ggplot(sharing_net, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=`sharing_net$.`)) +
-   geom_rect() +
+  geom_rect() +
   geom_text(x= 3.5, aes(y=labelPosition, label = paste0("N = ", Freq, ",\n", round(fraction*100, digit = 1), "%")), size = 5, fontface = "bold") +
-   coord_polar(theta="y") + 
-   xlim(c(2, 4)) + 
+  coord_polar(theta="y") + 
+  xlim(c(2, 4)) + 
   theme_void() +
   labs(title = "Networks in which data are shared") +
   theme(plot.title = element_text(face = "bold", size = 16, hjust = 0.5),

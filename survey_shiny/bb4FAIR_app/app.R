@@ -24,6 +24,7 @@ library(waiter)
 library(shinyWidgets)
 
 
+
 # toast options
 toastOpts <- list(
   autohide = TRUE,
@@ -36,7 +37,7 @@ toastOpts <- list(
 # tier_BB <- read_xlsx("/punteggi_tiering.xlsx", sheet = "abb")  
 
 scores <- read_xlsx("./tiering.xlsx")
-# 
+
 # scores <- read_xlsx("./punteggi_tiering.xlsx", sheet = "punteggi_totali")
 colnames(scores)[1] <- "BB_ID"
 
@@ -50,13 +51,13 @@ scores$tier <- ifelse(scores$total_score > 20, "Mature",
 macroareas <- info_area[1:14,c("question","area")]
 macroareas$question <- str_replace(str_replace(macroareas$question, " ", "_"), "-", "_")
 
-
-scores <- scores %>%arrange(desc(total_score))
-scores$BB_ID <- paste0("BB", seq(1:dim(scores)[1]))
+#scores$BB_ID <- paste0("BB", seq(1:dim(scores)[1]))
+scores <- scores %>% arrange(desc(total_score))
+scores$BB_ID <- paste0("BB-", sample(100:999, size = nrow(scores), replace = FALSE))
 
 
 ## question labels
-source("./plot.R") # import plots 
+source("./plot.R") # import plots
 
 plots <- list(
   "Personnel dedicated to the Biobank" = function() chart_personnel,
@@ -171,7 +172,7 @@ ui <-
                             br(),
                             fluidRow(
                               column(4,
-                                     bs4Card(title = "Select your Biobank ID", selectInput(inputId = "bb_name_plot", label = NULL, choices = unique(as.character(scores$BB_ID))), width = 10, headerBorder = FALSE, collapsible = FALSE),
+                                     bs4Card(title = "Select a Biobank ID", selectInput(inputId = "bb_name_plot", label = NULL, choices = unique(as.character(scores$BB_ID))), width = 10, headerBorder = FALSE, collapsible = FALSE),
                                      valueBoxOutput("tiering_valueBox", width = 10),
                                      bs4Card(title = "Ranking Position", label = NULL, uiOutput("slider"), width = 10, collapsible = FALSE)
                               ),
@@ -244,7 +245,7 @@ server <- function(input, output) {
   )))
   
   #preprocessing data long form for plots
-  scores_forplot <- scores%>%arrange(desc(total_score))
+  scores_forplot <- scores %>% arrange(desc(total_score))
   # scores <- scores%>%arrange(desc(total_score))
   tier_norm_BB <- round(scores_forplot[,2:16] %>%
                           mutate(dedicated_personnel = dedicated_personnel/max(dedicated_personnel),
@@ -256,8 +257,9 @@ server <- function(input, output) {
                                  annotations = annotations/max(annotations),
                                  informed_consent = informed_consent/max(informed_consent)
                           ),2)
-  tier_norm_BB$biobank <- seq(1,37)
-  
+  #tier_norm_BB$biobank <- seq(1,37)
+  tier_norm_BB$biobank <- scores$BB_ID
+
   tier_norm_BB$tier <- ifelse(tier_norm_BB$total_score < 11, "Starting",
                               ifelse(tier_norm_BB$total_score < 21, "Advanced", "Mature"))
   
@@ -267,10 +269,8 @@ server <- function(input, output) {
                    macro_areas=c(rep(c(rep("personnel",4),rep("infrastructure",5),rep("data",5)),
                                      nrow(tier_norm_BB))))
   
+  
 
-  
-  
-  
   
   # Heatmap -----------------------------------------------------------
   
@@ -337,8 +337,9 @@ server <- function(input, output) {
   
   BB_data <- vector(mode='list', length=length(unique(dati1$biobank)))
   
+  bb <- unique(dati1$biobank) 
   for(i in 1:length(unique(dati1$biobank))){
-    BB_data[[i]] <- dati1[which(dati1$biobank == i),]
+    BB_data[[i]] <- dati1[which(dati1$biobank == bb[i]),]
   }
   
   BB_median <- dati1 %>%
@@ -350,21 +351,25 @@ server <- function(input, output) {
   for(i in 1:length(BB_data)){
     BB_data[[i]]$score_M <- BB_median$score
     BB_data[[i]]$diff <- BB_data[[i]]$score - BB_data[[i]]$score_M
-    names(BB_data)[i] <- paste0("BB",BB_data[[i]]$biobank[1])
+    names(BB_data)[i] <- BB_data[[i]]$biobank[1]
   }
-  
+  #names(BB_data)[i] <- paste0("BB",BB_data[[i]]$biobank[1])
+
   BB_data_fill <- BB_data
   
   for(i in 1:length(BB_data)){
     BB_data_fill[[i]]$nuova_variabile <- seq(1:14)
   }
   
-  for(i in 1:length(BB_data)){
-    BB_data_fill[[i]]$BB_ID <- paste0("BB",BB_data_fill[[i]]$biobank)
+#  for(i in 1:length(BB_data)){
+#    BB_data_fill[[i]]$BB_ID <- paste0("BB",BB_data_fill[[i]]$biobank)
+#    names(BB_data_fill)[i] <- BB_data_fill[[i]]$BB_ID[1]
+#    }
+
+for(i in 1:length(BB_data)){
+    BB_data_fill[[i]]$BB_ID <- BB_data_fill[[i]]$biobank
     names(BB_data_fill)[i] <- BB_data_fill[[i]]$BB_ID[1]
     }
-
-  
   
 
   output$density <- renderPlot({ggplot(dati)+
@@ -394,6 +399,8 @@ server <- function(input, output) {
                                width = 345.6, height = 345.6, execOnResize = FALSE)
                                     
   
+
+
   output$heatmap <- renderPlot({ggplot(dati, aes(x = biobank, y = nuova_variabile, fill = score)) +
                                   geom_tile(color = "black", linewidth = 0.7) +
                                   scale_fill_gradient(low = "#244270", high = "#EB5E00") +
@@ -413,9 +420,11 @@ server <- function(input, output) {
                                         legend.title = element_text(face = "bold", , size = 11, margin = margin(b = 10)),
                                         strip.placement = "inside") +
                                   facet_grid(rows = vars(macro_areas), switch = "y", scale = "free") +
-                                  scale_x_continuous(expand = c(0.01, 0.01), breaks = seq(min(dati$biobank), max(dati$biobank), by = 1))}, 
+                                  scale_x_discrete(expand = c(0.01, 0.01)) +
+                                  theme(axis.text.x = element_text(angle = 45, hjust = 1))}, 
                                 width = 950.4, height = 345.6, execOnResize = FALSE)
 
+#scale_x_continuous(expand = c(0.01, 0.01), breaks = seq(min(dati$biobank), max(dati$biobank), by = 1))
   
   
   output$radar1 <- renderPlot({ggradar(
@@ -627,7 +636,7 @@ names(BB_data_fill)
   })
   
   tiering_text <- reactive({
-    validate(need(input$bb_name_plot, "Please select a Biobank ID"))
+    validate(need(input$bb_name_plot, "Please select Biobank ID"))
     scores$tier[scores$BB_ID == input$bb_name_plot]
   })
   
