@@ -134,10 +134,10 @@ dashboardPage(
       fluidRow(column(3.5, plotOutput("density")), column(4, plotOutput("heatmap", height = "300px"))),
       br(),
       fluidRow(
-        column(width = 2.2, class = "col-sm-3", plotOutput("radar3")),
-        column(width = 2.5, class = "col-sm-3", plotOutput("radar2")),
-        column(width = 2.5, class = "col-sm-3", plotOutput("radar1")),
-        column(width = 3, class = "col-sm-3", plotOutput("legend"))
+        column(width = 1, class = "col-sm-3", plotOutput("radar3")),
+        column(width = 1, class = "col-sm-3", plotOutput("radar2")),
+        column(width = 1, class = "col-sm-3", plotOutput("radar1")),
+        column(width = 1.5, class = "col-sm-3", plotOutput("legend"))
       )
     )),
     

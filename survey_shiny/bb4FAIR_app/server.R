@@ -220,7 +220,7 @@ server <- function(input, output) {
             axis.ticks.x.bottom = element_blank(),
             axis.title.x = element_text(face = "bold",margin = margin(t = 10)),
             axis.title.y = element_text(face = "bold"),
-            strip.text = element_text(face = "bold", size = 13),
+            strip.text = element_text(face = "bold", size = 10),
             legend.text = element_text(face = "bold", size = 11),
             legend.title = element_text(face = "bold", , size = 11, margin = margin(b = 10)),
             strip.placement = "inside") +
@@ -241,7 +241,7 @@ dati$macro_aree <- recode(dati$macro_areas, personnel = "personale", "IT infrast
             axis.text.y.right = element_text(color = "black", face = "bold",size = 10, hjust = 1),
             axis.title.x = element_text(face = "bold"),
             axis.title.y.right = element_text(face = "bold", margin = margin(l = 15)),
-            strip.text.y = element_text(face = "bold",size = 9),
+            strip.text.y = element_text(face = "bold", size = 11),
             legend.text = element_text(face = "bold"),
             legend.title = element_text(face = "bold"),
             legend.position="none",
@@ -256,7 +256,7 @@ dati$macro_aree <- recode(dati$macro_areas, personnel = "personale", "IT infrast
             panel.spacing.x = unit(-1, "lines")) +
       scale_x_continuous(expand = c(0.01, 0.01), labels = c("0", "0.25", "0.50", "0.75", "1"))
     
-  }, width = 320, height = 400, execOnResize = FALSE)
+  }, width = 320, height = 380, execOnResize = FALSE)
 
   
   # Radarplots --------------------------------------------------------
@@ -489,27 +489,26 @@ dati$macro_aree <- recode(dati$macro_areas, personnel = "personale", "IT infrast
     
 # Radarplots legend -------------------------------------------------
 
-etichette1 <- paste0("    ", etichette)
-
+etichette1 <- paste0("  ", etichette)
 mytheme <- ttheme_default(
   core = list(
-    fg_params = list(hjust = 0, x = 0.1, fontsize = 12),
+    fg_params = list(hjust = 0, x = 0.1, fontsize = 11),
     padding = unit(c(0.5, 0.5), "cm")
   ),
   colhead = list(
-    fg_params = list(fontsize = 12, fontface="bold"),
+    fg_params = list(fontsize = 11, fontface="bold"),
     padding = unit(c(0.5, 0.5), "cm")
   )
 )
-tabella <- tableGrob(data.frame(etichette1 = as.character(etichette1), 
+tabella <- tableGrob(rows = NULL, data.frame(etichette1 = as.character(etichette1), 
                                 nuova_variabile = c(as.character(unique(dati$nuova_variabile)))),					
                      theme = mytheme, cols = c("short", "extended"))
 tabella$widths <- unit(tabella$widths + unit(0.5, "cm"), "cm")
 
 
 output$legend <- renderPlot({
-  grid.arrange(tabella, nrow = 1)
-}, width = 400, height = 350, execOnResize = FALSE)
+  grid.arrange(tabella)
+}, width = 360, height = 320, execOnResize = FALSE)
 
  
   
@@ -574,7 +573,7 @@ tier_BB$tier <- ifelse(
           title = element_text(color = "black", face = "bold", size = 15),
           axis.title.x = element_text(face = "bold", margin = margin(t = 10)),
           axis.title.y = element_text(face = "bold"),
-          strip.text = element_text(face = "bold", size = 12),
+          strip.text = element_text(face = "bold", size = 10),
           legend.position = "bottom",
           legend.text = element_text(color = "black", face = "bold", size = 12),
           legend.title = element_text(color = "black", face = "bold", size = 10))}, width = 650, height = 450
