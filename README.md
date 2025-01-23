@@ -10,7 +10,7 @@ It comprises of:
 1) a survey with 38 questions divided in three macro areas, namely IT infrastructure, personnel, and data annotation richness
 2) an automated R system to analyze and produce data visualization based on the survey results.
 
-![graph_abs-GA](https://github.com/bbdataeng/BB4FAIR/blob/main/visualization/Tier_Viz.png)
+![shiny](https://github.com/bbdataeng/BB4FAIR/blob/main/graphics/Figure_3.png)
 
 
 ### Requirements
